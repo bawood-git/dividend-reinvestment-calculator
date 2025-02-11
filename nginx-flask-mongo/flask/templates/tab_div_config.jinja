@@ -1,0 +1,43 @@
+<div class="divContent">
+    <span class="tabTitle">Configure Model Parameters</span>
+    <div class="divInnerContent" style="height: 75px;">
+        <form action="{{ url_for('report') }}" method="post" name="reportForm" id="reportForm">
+            <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
+            <input type="hidden" name="share_price" value = "{{quote['Global Quote']['05. price']}}"/>
+            <input type="hidden" name="stock_symbol" value = "{{quote['Global Quote']['01. symbol']}}"/>
+            <table width="100%">
+                <tr>
+                    <th>Dividend</th>
+                    <th>Quantity</th>
+                    <th>No. Periods</th>
+                    <th>Frequency</th>
+                    <th>Contributions</th>
+                    <th>Volatility</th>
+                    <th>Purchase Mode</th>
+                </tr>
+                <tr>
+                    <td><input type="text" class="inputText" name="dividend" value="{{model['distribution']}}"></td>
+                    <td><input type="text" class="inputText" name="shares_owned" value="{{model['shares_owned']}}"></td>
+                    <td><input type="text" class="inputText" name="term" value="{{model['term']}}"></td>
+                    <td>
+                        <select name="frequency">
+                            <option value="Monthly"     {% if "Monthly" == model['frequency'] %}    selected {% endif %}> Monthly</option>
+                            <option value="Quarterly"   {% if "Quarterly" == model['frequency'] %}  selected {% endif %}> Quarterly</option>
+                            <option value="Semiannual"  {% if "Semiannual" == model['frequency'] %} selected {% endif %}> Semiannual</option>
+                            <option value="Annual"      {% if "Annual" == model['frequency'] %}     selected {% endif %}> Annual</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="inputText" name="contribution" value="{{model['contribution']}}"></td>
+                    <td><input type="text" class="inputText" name="volatility" value="{{model['volatility']}}"></td>
+                    <td>
+                        <select name="purchase_mode">
+                            <option value="Fractional" {% if "Fractional" == model['purchase_mode'] %}  selected {% endif %}>Fractional</option>
+                            <option value="Whole"      {% if "Whole" == model['purchase_mode'] %}  selected {% endif %}>Whole</option>
+                        </select>
+                    </td>
+                    <td><input type="submit" name="refreshData" class="inputButton" value="Run"></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+{% from 'bootstrap5/form.html' import render_form %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+        <div class="page">
+            {{header|safe}}
+        </div>
+        <br>
+
+        <div class="divContent" style="height: 405px; width: 725px;">
+            <span class="tabTitle">Disclaimer</span>
+            <div class="divInnerContent" style="height: 350px; width: 700px;">
+                <p>Hey, thanks for trying me out. </p>
+                <p>One quick note - this software is experimental at best and not intended to predict outcomes of future trades. Caviat emptor to the max. </p>
+                <p>Now, go plug in a stock symbol in the search bar, located in the upper right corner of the page.</p>
+            </div>
+        </div>
+
+        </div>
+    </body>
+</html>

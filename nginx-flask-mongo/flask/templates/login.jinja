@@ -1,0 +1,14 @@
+{% from 'bootstrap5/form.html' import render_form %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+        <h2>Dividend Reinvestment Calculator v0.3</h2>
+        <div class="login">
+            {{ render_form(form) }}
+        </div>
+    </body>
+</html>

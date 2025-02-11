@@ -1,0 +1,22 @@
+{% from 'bootstrap5/form.html' import render_form %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+        {{header|safe}}
+        <br>
+        <div class="divContent" style="height: 405px; width: 725px;">
+            <span class="tabTitle">Disclaimer</span>
+            <div class="divInnerContent" style="height: 350px; width: 700px;">
+                <p style="font-size: larger; font-weight: bold;">Oops!</p>
+                <p> No records matched your search term: {{value}}</p>
+                <p> Only individual stocks are available for research at this time. ETFs, mutual funds, and the like will not appear.</p>
+                <p> If you are unsure, try searching for the company stock with your favorite search engine. Some populare picks include Apple (AAPL), Microsoft (MSFT), and Alphabet (GOOG).</p>
+
+                </div>
+        </div>
+    </body>
+</html>

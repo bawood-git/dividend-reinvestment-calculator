@@ -1,0 +1,45 @@
+<div class="divContent">
+    <span class="tabTitle">Dividend Metrics</span>
+    <div class="divInnerContent" style="height: 300px;">
+        <table>
+            <tr>
+                <th>Current Price</th>
+                <td>{{quote['Global Quote']['05. price']}}</td>
+            </tr>
+            <tr>
+                <th>Book Value</th>
+                <td>{{overview['BookValue']}}</td>
+            </tr>
+            <tr>
+                <th>P/E Ratio</th>
+                <td>{{overview['PERatio']}}</td>
+            </tr>
+            <tr>
+                <th>Beta</th>
+                <td>{{overview['Beta']}}</td>
+            </tr>
+            <tr>
+                <th>Annual Yield</th>
+                <td>{{overview['DividendYield']}}</td>
+            </tr>
+            <tr>
+                <th>Execution Date</th>
+                <td>{{overview['ExDividendDate']}}</td>
+            </tr>
+            <tr>
+                <th>Distibuted Date</th>
+                <td>{{overview['DividendDate']}}</td>
+            </tr>
+            <tr>
+                <th>Dividend Amount</th>
+                <td>{{dividend['amount']}}</td>
+            </tr>
+            <tr>
+                <td><button class="inputButton" id="button_div_history"
+                        onclick="window.open('{{url_for('history')}}?r=history&symbol={{quote['Global Quote']['01. symbol']}}','_blank')">History</button>
+                </td>
+            </tr>
+
+        </table>
+    </div>
+</div>

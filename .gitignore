@@ -1,0 +1,4 @@
+__pycache__
+flask_session
+# local dev store not for sharing
+local_config.json

@@ -1,0 +1,25 @@
+<div class="divContent">
+<table class="tableHeader">
+    <tr>
+		<td>
+            <span class="heading">Dividend Reinvestment Calculator</span>
+            <br>
+            <span class="subheading">v0.4.2</span>
+        </td>
+        <td style="width: 226px;">
+			<a href="{{url_for('index')}}">Home</a> &nbsp;
+			<a href="{{url_for('index')}}">Settings</a> &nbsp;
+			<a href="{{url_for('index')}}">Watchlist</a>
+            
+			<div style="border-radius: 15px; background-color: white; width: 226px; margin-top: 15px;">
+                <form action="{{ url_for('search') }}" method="post" class="search_form">
+                    <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
+                    <img src="{{ url_for('static', filename='mag.png') }}" height="14px" style="margin-left: 5px;" />
+                    <input type="text" name="symbol" class="inputSearchText">
+                </form>
+            </div>
+                        
+        </td>
+    </tr>
+</table>
+</div>

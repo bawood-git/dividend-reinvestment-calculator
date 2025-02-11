@@ -1,0 +1,6 @@
+pymongo
+flask
+Flask-WTF
+Flask-Session
+bootstrap-flask
+requests

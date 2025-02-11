@@ -1,0 +1,23 @@
+{% from 'bootstrap5/form.html' import render_form %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+        <div class="page">
+            {{header|safe}}
+            <br>
+            <table>
+                <tr>
+                    <td style="vertical-align: top;">{{profile|safe}}</td>
+                    <td style="vertical-align: top;">{{metrics|safe}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2">{{config|safe}}</td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>

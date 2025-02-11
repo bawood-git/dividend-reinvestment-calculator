@@ -1,0 +1,181 @@
+  
+  :root {
+    /* Text and container colors */
+    --text:           #000000;
+    --heading:        #FFFCF2;
+    --link:           #FFFCF2;
+    --link-hover:     #EB5E28;
+    --background:     #e3e1dc;    /* Page background */
+    --div-header:     #2A3D45;    /* Widget border */
+    --div-content:    #446678;    /* Widget container background */
+    --tbl-content:    #FFFCF2cc;  /* Widget information panel background with alpha */
+    --tbl-heading:    #2A3D45;    /* Content headings */
+    --tbl-rpt-txt:    White;      /* Report tool text */
+  }
+  .page {
+    text-align: center;
+    width: 1280px;
+  }
+    
+  body {
+    font-family:      Verdana;
+    color:            var(--text);
+    background-color: var(--background); 
+    margin: 10px;
+  }  
+  
+  a {
+    color:            var(--link); 
+    text-decoration:  none;
+  }
+
+  a:hover {
+    color: var(--link-hover);
+  }
+  
+  .inputText {
+    padding:          8px;
+    width:            100px;
+    border:           none;
+    border-radius:    5px;
+    outline:          none;
+  }
+
+  .inputText:hover {
+    box-shadow:       0 8px 16px rgba(0,0,0,0.4);
+  }
+
+  .inputSearchText {
+    padding:          8px;
+    width:            175px;
+    border:           none;
+    border-radius:    10px;
+    outline:          none;
+  }
+  .inputSearchText:-webkit-autofill {
+    
+    -webkit-text-fill-color: black;
+    -webkit-box-shadow: 0 0 0px 1000px white inset; 
+}
+
+  .inputButton {
+    padding:          10px;
+    width:            75px;
+    border:           none;
+    border-radius:    10px;
+    box-shadow:       0 4px 8px rgba(0,0,0,0.2);
+  }
+
+  .inputButton:hover {
+    box-shadow:       0 8px 16px rgba(0,0,0,0.4);
+  }
+  .inputButton:active {
+    transform: translateY(4px)
+  }
+  
+  select {
+    padding:          8px;
+    width:            175px;
+    border:           none;
+    border-radius:    5px;
+    outline:          none;
+  }
+
+  select:hover {
+    box-shadow:       0 8px 16px rgba(0,0,0,0.4);
+  }
+  
+  .heading {
+    font-size:        x-large;
+    font-weight:      bold;
+    color:            var(--heading);
+  }
+
+  .subheading {
+    font-size:        large;
+    color:            var(--heading);
+  }
+
+  .divHeader {
+    background-color: var(--div-header);
+    border-radius:    15px;
+    border:           none;
+  }
+
+  .divContent {
+    padding:          10px;
+    background-color: var(--div-content);
+    border-radius:    15px;
+    border:           1px solid var(--div-header);
+    text-align:       left;
+    box-shadow:       0 8px 16px rgba(0,0,0,0.4);
+  }
+  .divInnerContent {
+    margin-top: 10px;
+    padding:          10px;
+    background-color: var(--background);
+    border-radius:    15px;
+    border:           1px solid var(--div-header);
+    text-align:       left;
+    overflow-x:       hidden;
+    overflow-y:       auto;
+  }
+
+  .tabTitle{
+    color:            var(--heading);
+    font-size:        large;
+    font-weight:      bold;
+    text-align:       left;
+  }
+
+  .tableHeader {
+    width:            100%;
+    padding:          10px 10px;
+    border:           none;
+    text-align:       left;
+  }
+/* DEL */
+  .tableContent {
+    width:            100%;
+    margin-top:       10px;
+    padding:          10px 10px;
+    background-color: var(--tbl-content);
+    border-radius:    15px;
+  }
+
+  th {
+    font-size:        medium;
+    color:            var(--tbl-heading);
+    vertical-align:   top;
+  }
+  
+  td {
+    text-align:       left;
+    vertical-align:   top;
+    padding: 5px;
+  }
+
+  .login {
+    display:          flex;
+    justify-content:  center;
+  }
+
+  .chart {
+    padding-left:     5px;
+    width:            800px;
+  }
+
+  .totals {
+    margin-left:      10px;
+    padding-left:     5px;
+  }
+
+  .rptHeader {
+    color:            var(--tbl-rpt-txt);
+
+  }
+
+  .rptRow {
+    color:            var(--tbl-rpt-txt);
+
+  }
