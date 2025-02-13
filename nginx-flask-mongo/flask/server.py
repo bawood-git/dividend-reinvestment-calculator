@@ -18,10 +18,9 @@ from wtforms.validators import DataRequired, Length
 
 # Local
 from portfolio import Portfolio, Stock, Position
-from alpha import AlphaAPI
+from api_config import APIConfiguration, DataMap
 
 # Config
-
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
@@ -30,12 +29,13 @@ app.secret_key = 'f4h5WR77S6w_pnvzZAwMHGuTW-1vDc2C'
 
 bootstrap = Bootstrap5(app)
 csrf = CSRFProtect(app)
-
 client = MongoClient("mongo:27017")
 
-
-api = AlphaAPI('./local/local_config.json')
-
+api_config = APIConfiguration('./local/local_config.json')
+api_functions = None
+if api_config.config['datasource'] == 'alpha_vantage':
+    from api_config import AlphaVantage
+    api_functions = AlphaVantage(api_config.config)
 
 class LoginForm(FlaskForm):
     uname  = StringField('Username')    # JSON 
@@ -63,7 +63,7 @@ def search():
     
     if 'POST' == request.method:
         
-        overview = alpha.getOverview(symbol)
+        overview = api_functions.getOverview(symbol)
         
         # Page header
         tab_div_header = render_template("tab_div_header.jinja")
@@ -74,18 +74,18 @@ def search():
 
         # Record found, fetch all data, build form
         else:
-            quote     = alpha.getQuote(symbol)
-            dividends = alpha.getDividendHistory(symbol)
+            quote     = api_functions.getQuote(symbol)
+            dividends = api_functions.getDividendHistory(symbol)
             dividend  = dividends['data'][0]
             
             # Init config defaults
             model = {
                 "stock_symbol"  : symbol,
                 "share_price"   : quote['Global Quote']['05. price'],  
-                "shares_owned"  : 1000,                 # Initial position
-                "distribution"  : dividend['amount'],   # Dividend payout
-                "term"          : 48,                  # Number of iterations  
-                "contribution"  : 0.00,                    # Term contribution
+                "shares_owned"  : 1000,                 
+                "distribution"  : dividend['amount'],   
+                "term"          : 48,                    
+                "contribution"  : 0.00,
                 "volatility"    : overview['Beta'],                 
                 "frequency"     : "Quarterly",
                 "purchase_mode" : "Fractional",
@@ -110,18 +110,17 @@ def report():
             "share_price"   : request.form.get('share_price'),  
             "shares_owned"  : request.form.get('shares_owned'),  # Initial position
             "distribution"  : request.form.get('dividend'),      # Dividend payout
-            "term"          : int(request.form.get('term')),     # Number of iterations  
+            "term"          : request.form.get('term'),          # Number of iterations  
             "contribution"  : request.form.get('contribution'),  # Term contribution
             "volatility"    : request.form.get('volatility'),    # Default: Beta
             "frequency"     : request.form.get('frequency'),
             "purchase_mode" : request.form.get('purchase_mode'),
         }
-       
-        symbol    = request.form.get('stock_symbol')
-        overview  = alpha.getOverview(symbol)
-        quote     = alpha.getQuote(symbol)
-        dividends = alpha.getDividendHistory(symbol)
-        dividend  =  dividends['data'][0]
+
+        overview  = api_functions.getOverview(model['stock_symbol'])
+        quote     = api_functions.getQuote(model['stock_symbol'])
+        dividends = api_functions.getDividendHistory(model['stock_symbol'])
+        dividend  = dividends['data'][0]
        
         tab_div_profile = render_template('tab_div_profile.jinja', dividend=dividend, quote=quote, overview=overview)
         tab_div_metrics = render_template('tab_div_metrics.jinja', dividend=dividend, quote=quote, overview=overview)
@@ -142,18 +141,19 @@ def report():
             "pct_growth":0.00
         }
 
-        # Config parameters    
+        # Config parameters
+        term         = int(model['term'])
         contribution = float(model['contribution'])     
         shares_owned = float(model['shares_owned'])   
         share_price  = float(model['share_price'])   
         volatility   = float(model['volatility'])      
-        distribution = float(model['distribution'])  
+        distribution = float(model['distribution'])
         
         # Initial balance
         balance = float('0.00')
 
-        # Calculate 
-        for m in range(1, 1 + model['term']):
+        # Calculate each period
+        for p in range(1, 1 + term):
 
             #Calculate volatile price 
             if volatility > 0:
@@ -179,12 +179,12 @@ def report():
                 shares_purchased = balance // share_price # Whole shares only
 
             # Update data for term (row)
-            if shares_purchased >= 1.0:
+            if shares_purchased >= 0:
                 shares_owned += shares_purchased
                 balance = balance - (shares_purchased * share_price)
             
             row_data = {
-                "period":       m,
+                "period":       p,
                 "balance":      balance,
                 "shares_owned": shares_owned,
                 "price":        f'${share_price:,.2f}',
@@ -194,23 +194,36 @@ def report():
                 "contribution": f'${contribution:,.2f}',
                 "purchased":    shares_purchased,
             }
-            totals['months'] = m
+            totals['periods'] = p
             totals['value'] = shares_owned * share_price
             totals['contributions'] += contribution
-            totals['last_dividend'] = dividend
+            totals['next_dividend'] = dividend
             totals['total_dividends'] += dividend
             totals['shares_owned'] = shares_owned
+            totals['years_vested'] = 0
 
             if shares_owned > 0:
-                totals['pct_growth'] = dividend / totals['value']
+                totals['pct_growth'] = (totals['total_dividends'] / totals['value']) *100
 
             report.append(row_data)
             rows.append(render_template('dividend_row.jinja', **row_data))
-            summary = render_template('dividend_totals.jinja', **totals)
+
+        match model['frequency']:
+            case 'Monthly': 
+                totals['years_vested'] = term /12
+            case 'Quarterly':
+                totals['years_vested'] = term /4
+            case 'Biannually':
+                totals['years_vested'] = term /2
+            case 'Annually':
+                totals['years_vested'] = term
+        summary = render_template('tab_div_summary.jinja', totals=totals)
+
 # Roll up chart data    
         i = len(report)
         cols = [i for i in range(1, i +1)]
         income = [float(r.get('income').replace('$','').replace(',','')) for r in report]
+        # divide assets by 100 to keep chart lines relative to each other.
         assets =  [r.get('asset_value')/100 for r in report]
         tab_div_chart = render_template('tab_div_chart.jinja',
                                 labels=cols, 
@@ -235,11 +248,6 @@ def report():
 @app.route('/history', methods=['GET','POST'])
 def history():
     return f'TODO: Add chart/data visual from alpha.getDividendHistory()'
-
-@app.route('/export/pdf', methods=['GET','POST'])
-def pdfExport(mode, rows):
-
-    return render_template('report_pdf.jinja', rows=rows,), 200, {'ContentType':'text/json; charset=utf-8'}
 
 @app.route('/export/csv', methods=['GET','POST'])
 def csv(rows):

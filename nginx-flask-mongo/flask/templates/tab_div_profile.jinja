@@ -1,8 +1,11 @@
 <div class="divContent" style="width: 800px;">
-    <span class="tabTitle">Company Profile</span>
+    <table width="100%">
+        <tr>
+            <td><span class="tabTitle">Company Profile</span></td>
+            <td style="text-align: right;"><a href="" target="_blank"></a></td>
+        </tr>
+    </table>
     <div class="divInnerContent" style="height: 300px;">
-        <form action="{{ url_for('report') }}" method="post" name="profileForm">
-            <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
             <table width="100%">
                 <tr>
                     <tr>
@@ -39,6 +42,5 @@
                     </tr>
                 </tr>
             </table>
-        </form>
     </div>
 </div>

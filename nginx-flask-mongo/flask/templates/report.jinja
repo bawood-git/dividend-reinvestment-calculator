@@ -1,68 +1,46 @@
 {% from 'bootstrap5/form.html' import render_form %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 </head>
-
 <body>
-
     <div class="page">
         {{header|safe}}
         <br>
-
-    <table width="100%">
-        <tr>
-            <td>{{profile|safe}}</td>
-            <td>{{metrics|safe}}</td>
-        </tr>
-        <tr>
-            <td colspan="2">{{config|safe}}</td>
-        </tr>
-        <tr>
-            <td style="width: 600px;">
-                {{chart|safe}}
-            </td>
-            <td rowspan="2">
-                <div class="divContent">
-                    <span class="tabTitle">Report Summary</span>
-                    <div class="divInnerContent" style="height: 250px;">
-                        <table>
-                            {{summary|safe}}
-                        </table>
-                    </div>
-                </div>
-                <br>
-
-                <div class="divContent">
-                    <span class="tabTitle">Data Export</span>
-                    <table>
-                        <tr>
-                            <td><button class="inputButton" id="button_pdf">PDF</button></td>
-                            <td><button class="inputButton" id="button_csv" onclick="window.open('/','_blank')">CSV</button></td>
-                            <td><button class="inputButton" id="button_json" onclick="window.open('/','_blank')">JSON</button></td>
-                        </tr>
-                    </table>
-                </div>
-            </td>
-        </tr>
-    </table>
-</div>
+        <table width="100%">
+            <tr>
+                <td style="width: 600px;">{{profile|safe}}</td>
+                <td>{{metrics|safe}}</td>
+            </tr>
+            <tr>
+                <td colspan="2">{{config|safe}}</td>
+            </tr>
+            <tr>
+                <td style="width: 600px">
+                    {{chart|safe}}
+                </td>
+                <td rowspan="2">
+                    {{summary|safe}}
+                </td>
+            </tr>
+        </table>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <script>
-        const doc = new jsPDF();       
-        dqs = document.querySelector("#page");
-
-        button = document.getElementById("button_pdf");
-        button.addEventListener("click", 
-            function () {
-                doc.fromHTML(dqs);
+        document.getElementById("link_pdf").addEventListener('click', () => {
+                dqs = document.querySelector(".page");
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                doc.html(dqs);
                 doc.save("{{ticker}}.pdf");
-         });
+        });
     </script>
 
 </body>

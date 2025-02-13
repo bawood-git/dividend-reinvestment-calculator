@@ -1,5 +1,10 @@
 <div class="divContent">
-    <span class="tabTitle">Dividend Metrics</span>
+    <table width="100%">
+        <tr>
+            <td><span class="tabTitle">Dividend Metrics</span></td>
+            <td style="text-align: right;"><a href="" target="_blank">History</a></td>
+        </tr>
+    </table>
     <div class="divInnerContent" style="height: 300px;">
         <table>
             <tr>
@@ -34,12 +39,6 @@
                 <th>Dividend Amount</th>
                 <td>{{dividend['amount']}}</td>
             </tr>
-            <tr>
-                <td><button class="inputButton" id="button_div_history"
-                        onclick="window.open('{{url_for('history')}}?r=history&symbol={{quote['Global Quote']['01. symbol']}}','_blank')">History</button>
-                </td>
-            </tr>
-
         </table>
     </div>
 </div>

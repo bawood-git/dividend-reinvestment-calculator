@@ -5,16 +5,16 @@
     --heading:        #FFFCF2;
     --link:           #FFFCF2;
     --link-hover:     #EB5E28;
-    --background:     #e3e1dc;    /* Page background */
+    --background:     #3e3b32;    /* Page background */
     --div-header:     #2A3D45;    /* Widget border */
-    --div-content:    #446678;    /* Widget container background */
-    --tbl-content:    #FFFCF2cc;  /* Widget information panel background with alpha */
-    --tbl-heading:    #2A3D45;    /* Content headings */
+    --div-content:    #445c78b3;    /* Widget container background */
+    --tbl-content:    #e3e3e3cf;  /* Widget information panel background with alpha */
+    --tbl-heading:    #000000;    /* Content headings */
     --tbl-rpt-txt:    White;      /* Report tool text */
   }
   .page {
     text-align: center;
-    width: 1280px;
+    width: 1200px;
   }
     
   body {
@@ -25,6 +25,7 @@
   }  
   
   a {
+    font-style: oblique;
     color:            var(--link); 
     text-decoration:  none;
   }
@@ -34,6 +35,7 @@
   }
   
   .inputText {
+    font-size:        medium;
     padding:          8px;
     width:            100px;
     border:           none;
@@ -55,10 +57,12 @@
   .inputSearchText:-webkit-autofill {
     
     -webkit-text-fill-color: black;
+    
     -webkit-box-shadow: 0 0 0px 1000px white inset; 
 }
 
   .inputButton {
+    font-size:        medium;
     padding:          10px;
     width:            75px;
     border:           none;
@@ -74,6 +78,7 @@
   }
   
   select {
+    font-size:        medium;
     padding:          8px;
     width:            175px;
     border:           none;
@@ -113,7 +118,7 @@
   .divInnerContent {
     margin-top: 10px;
     padding:          10px;
-    background-color: var(--background);
+    background-color: var(--tbl-content);
     border-radius:    15px;
     border:           1px solid var(--div-header);
     text-align:       left;
@@ -137,21 +142,19 @@
 /* DEL */
   .tableContent {
     width:            100%;
-    margin-top:       10px;
     padding:          10px 10px;
     background-color: var(--tbl-content);
     border-radius:    15px;
+    vertical-align:   top;
   }
 
   th {
     font-size:        medium;
     color:            var(--tbl-heading);
-    vertical-align:   top;
   }
   
   td {
     text-align:       left;
-    vertical-align:   top;
     padding: 5px;
   }
 

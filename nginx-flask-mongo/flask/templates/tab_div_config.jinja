@@ -1,5 +1,10 @@
 <div class="divContent">
-    <span class="tabTitle">Configure Model Parameters</span>
+    <table width="100%">
+        <tr>
+            <td><span class="tabTitle">Configure Model Parameters</span></td>
+            <td style="text-align: right;"><a href="" target="_blank">Help</a></td>
+        </tr>
+    </table>
     <div class="divInnerContent" style="height: 75px;">
         <form action="{{ url_for('report') }}" method="post" name="reportForm" id="reportForm">
             <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
@@ -31,8 +36,8 @@
                     <td><input type="text" class="inputText" name="volatility" value="{{model['volatility']}}"></td>
                     <td>
                         <select name="purchase_mode">
-                            <option value="Fractional" {% if "Fractional" == model['purchase_mode'] %}  selected {% endif %}>Fractional</option>
-                            <option value="Whole"      {% if "Whole" == model['purchase_mode'] %}  selected {% endif %}>Whole</option>
+                            <option value="Fractional" {% if "Fractional" == model['purchase_mode'] %}  selected {% endif %}>Fractional Shares</option>
+                            <option value="Whole"      {% if "Whole" == model['purchase_mode'] %}  selected {% endif %}>Whole Shares</option>
                         </select>
                     </td>
                     <td><input type="submit" name="refreshData" class="inputButton" value="Run"></td>
