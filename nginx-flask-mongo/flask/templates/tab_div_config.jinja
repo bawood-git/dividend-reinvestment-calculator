@@ -21,9 +21,9 @@
                     <th>Purchase Mode</th>
                 </tr>
                 <tr>
-                    <td><input type="text" class="inputText" name="dividend" value="{{model['distribution']}}"></td>
-                    <td><input type="text" class="inputText" name="shares_owned" value="{{model['shares_owned']}}"></td>
-                    <td><input type="text" class="inputText" name="term" value="{{model['term']}}"></td>
+                    <td><input type="text" class="inputText" autocomplete="off" name="dividend" value="{{model['distribution']}}"></td>
+                    <td><input type="text" class="inputText" autocomplete="off" name="shares_owned" value="{{model['shares_owned']}}"></td>
+                    <td><input type="text" class="inputText" autocomplete="off" name="term" value="{{model['term']}}"></td>
                     <td>
                         <select name="frequency">
                             <option value="Monthly"     {% if "Monthly" == model['frequency'] %}    selected {% endif %}> Monthly</option>
@@ -32,11 +32,11 @@
                             <option value="Annual"      {% if "Annual" == model['frequency'] %}     selected {% endif %}> Annual</option>
                         </select>
                     </td>
-                    <td><input type="text" class="inputText" name="contribution" value="{{model['contribution']}}"></td>
-                    <td><input type="text" class="inputText" name="volatility" value="{{model['volatility']}}"></td>
+                    <td><input type="text" autocomplete="off" class="inputText" name="contribution" value="{{model['contribution']}}"></td>
+                    <td><input type="text" autocomplete="off" class="inputText" name="volatility" value="{{model['volatility']}}"></td>
                     <td>
                         <select name="purchase_mode">
-                            <option value="Fractional" {% if "Fractional" == model['purchase_mode'] %}  selected {% endif %}>Fractional Shares</option>
+                            <option value="Fractional" {% if "Fractional" == model['purchase_mode'] %}  selected {% endif %}>Fractional</option>
                             <option value="Whole"      {% if "Whole" == model['purchase_mode'] %}  selected {% endif %}>Whole Shares</option>
                         </select>
                     </td>

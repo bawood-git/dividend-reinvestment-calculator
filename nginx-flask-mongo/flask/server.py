@@ -101,13 +101,13 @@ def search():
             config = {
                 "stock_symbol"  : symbol,
                 "share_price"   : quote['Global Quote']['05. price'],  
-                "shares_owned"  : 1000,                 
+                "shares_owned"  : 100,                 
                 "distribution"  : dividend['amount'],   
-                "term"          : 48,                    
+                "term"          : 20,                    
                 "contribution"  : 0.00,
                 "volatility"    : overview['Beta'],                 
                 "frequency"     : "Quarterly",
-                "purchase_mode" : "Fractional",
+                "purchase_mode" : "Whole",
             }
         
             tab_div_profile = render_template('tab_div_profile.jinja', quote=quote, dividend=dividend, overview=overview, sentiment=sentiment)

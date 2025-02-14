@@ -15,12 +15,17 @@
                 <td style="text-align: left;">{{totals['years_vested']}}</td>
             </tr>
             <tr>
-                <th>Vested Amount</th>
+                <th>Total Contributions</th>
                 <td style="text-align: left;">${{ "{:,.2f}".format(totals['contributions'])}}</td>
             </tr>
             <tr>
                 <th style="padding-top:3%; border-bottom: 1px solid black;" colspan="2">Assets</th>
             </tr>
+            <tr>
+                <th>Asset Growth</th>
+                <td style="text-align: left;">{{"{:,.3f}".format(totals['pct_growth'])}}%</td>
+            </tr>
+            <tr>
             <tr>
                 <th>Starting Assets</th>
                 <td style="text-align: left;">{{"${:,.2f}".format(totals['starting_assets'])}}</td>
@@ -29,12 +34,15 @@
                 <th>Ending Assets</th>
                 <td style="text-align: left;">{{"${:,.2f}".format(totals['ending_assets'])}}</td>
             </tr>
-            <tr>
-                <th>Asset Growth</th>
-                <td style="text-align: left;">{{"{:,.3f}".format(totals['pct_growth'])}}%</td>
+                <th>Total Shares</th>
+                <td style="text-align: left;">{{"{:,.2f}".format(totals['shares_owned'])}}</td>
             </tr>
             <tr>
                 <th style="padding-top:3%; border-bottom: 1px solid black;" colspan="2">Dividends</th>
+            </tr>
+            <tr>
+                <th>Distribution Growth</th>
+                <td style="text-align: left;">{{"{:,.2f}".format(totals['distribution_growth'])}}%</td>
             </tr>
             <tr>
                 <th>Starting Distribution</th>
@@ -43,14 +51,6 @@
             <tr>
                 <th>Ending Distribution</th>
                 <td style="text-align: left;">{{"${:,.2f}".format(totals['ending_distribution'])}}</td>
-            </tr>
-            <tr>
-                <th>Shares Accumulated</th>
-                <td style="text-align: left;">{{"{:,.2f}".format(totals['shares_owned'])}}</td>
-            </tr>
-            <tr>
-                <th>Distribution Growth</th>
-                <td style="text-align: left;">{{"{:,.2f}".format(totals['distribution_growth'])}}%</td>
             </tr>
             <tr>
                 <th>Total Reinvested</th>
