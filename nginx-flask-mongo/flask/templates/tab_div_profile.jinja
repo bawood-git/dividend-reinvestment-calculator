@@ -2,7 +2,7 @@
     <table width="100%">
         <tr>
             <td><span class="tabTitle">Company Profile</span></td>
-            <td style="text-align: right;"><a href="" target="_blank"></a></td>
+            <td style="text-align: right;"><a href="{{url_for('news',symbol=quote['Global Quote']['01. symbol'])}}" target="_blank">News</a></td>
         </tr>
     </table>
     <div class="divInnerContent" style="height: 300px;">
@@ -39,6 +39,10 @@
                     <tr>
                         <th>Exchange</th>
                         <td>{{overview['Exchange']}}</td>
+                    </tr>
+                    <tr>
+                        <th>Sentiment</th>
+                        <td>{{sentiment}}</td>
                     </tr>
                 </tr>
             </table>

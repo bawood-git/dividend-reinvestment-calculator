@@ -4,8 +4,8 @@
             <td><span class="tabTitle">Simulation</span></td>
             <td style="text-align: right;">
                 <a id="link_pdf" href="#">PDF</a>
-                <a href="" target="_blank">CSV</a>
-                <a href="" target="_blank">JSON</a>
+                <a href="/data/csv" target="_blank">CSV</a>
+                <a href="/data/json" target="_blank">JSON</a>
             </td>
         </tr>
     </table>
@@ -32,19 +32,26 @@ Chart.register({
 
     const ctx = document.getElementById('summary_chart').getContext('2d');
     const divChart = new Chart(ctx, {
-        type: 'line', // Change this to 'line', 'pie', etc. for different chart types
+        
         data: {
             labels: {{ labels }},
         datasets:
         [{
-            label:           'Dividend',
+            yAxisID:         'y1',
+            label:           'Income',
             data:            {{ income }},
+            type:            'line',
             borderColor:     '#DD5746',
+            fill:            false,
+            
         },
         {
-            label: 'Asset Value x 100',
-            data: {{ assets }},
-            borderColor: '#4793AF',
+            yAxisID:         'y2',
+            label:           'Assets',
+            data:            {{ assets }},
+            type:            'bar',
+            borderColor:     '#4793AF',
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
         },
         ]
                 },
@@ -55,7 +62,6 @@ Chart.register({
                         color: 'white',
                     }                    
                 }
-
             },
             responsive: true,
             scales: {
@@ -65,7 +71,22 @@ Chart.register({
                             }
 
                 },
-                y: {
+                y1: {
+                    type:'linear',
+                    position:'left',
+                    ticks: {
+                        color: 'white',
+                            callback: function(value, index, ticks) {
+                                return '$' + value;
+                            }
+                    }
+                },
+                y2: {
+                    type:'logarithmic',
+                    position:'right',
+                    grid: {
+                        drawOnChartArea: false, // Use left ticks
+                    },
                     ticks: {
                         color: 'white',
                             callback: function(value, index, ticks) {
@@ -75,7 +96,7 @@ Chart.register({
                 }
             },
             chartArea: {
-					backgroundColor: '#fffcf2c6'
+					backgroundColor: 'white'
 			}
         }
     });

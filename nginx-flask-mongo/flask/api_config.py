@@ -6,25 +6,6 @@ class APIConfiguration:
         with open(path, 'r') as f:
             self.config = json.load(f)
 
-class DataMap:
-    def __init__(self):
-        self.map = {
-            "overview":{},
-            "quote":{},
-            "dividend_history":{},
-            }
-    def mapAlphaAdvantage(self):
-        self.map['overview'] = {
-            "company_name":["Name",""],
-            "company_description":["Description",""],
-            "company_website":["OfficialSite",""],
-            "company_origin":["Country",""],
-            "category_sector":["Sector",""],
-            "category_industry":["Industry",""],
-            "stock_exchange":["Exchange",""],
-        }
-
-
 class AlphaVantage:
     def __init__(self, config):
         self.config = config
@@ -45,3 +26,7 @@ class AlphaVantage:
         r = requests.get(url)
         return r.json()
 
+    def getSentiment(self, symbol):
+        url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={symbol}&apikey={self.key}'
+        r = requests.get(url)
+        return r.json()

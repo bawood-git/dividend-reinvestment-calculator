@@ -1,0 +1,33 @@
+{% from 'bootstrap5/form.html' import render_form %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+        <div style="text-align: center; ">
+            <div class="divContent" style="width: 1200px; margin:auto">
+                <table width="100%">
+                    <tr>
+                        <td><span class="tabTitle">Related News</span></td>
+                        <td style="text-align: right;"><a href="" target="_blank"></a></td>
+                    </tr>
+                </table>              
+                <div class="divInnerContent" style="width: 1175px; margin:auto;">
+                    <table>
+                        {% for article in news['feed'] %}
+                            <tr><td>
+                            <p style="font-weight:bold">{{article['title']}}<br>
+                            <span style="font-style:oblique; font-weight:normal">{{article['time_published']}}, {{article['source']}}</span><br>
+                            <a style="color:blue" href="{{article['url']}}" target="_blank">{{article['url']}}</a>
+                            </p>
+                            </td></tr>
+                        {% endfor%}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

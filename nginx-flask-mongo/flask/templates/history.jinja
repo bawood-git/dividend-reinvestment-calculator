@@ -6,13 +6,14 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     </head>
     <body>
-        {{header|safe}}
-        <div style="text-align: center; margin-top:100px">
-
+        <div class="page">
+            {{header|safe}}
+        </div>
+        <div style="text-align: center; ">
             <div class="divContent" style="height: 405px; width: 725px; margin:auto">
-                <span class="tabTitle">Oops!</span>
-                <div class="divInnerContent" style="height: 350px; width: 700px;">
-                    {{msg|safe}}
+                <span class="tabTitle">Disclaimer</span>
+                <div class="divInnerContent" style="height: 350px; width: 700px; margin:auto;">
+                    {{history|safe}}
                 </div>
             </div>
         </div>

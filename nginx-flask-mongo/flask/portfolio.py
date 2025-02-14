@@ -45,3 +45,4 @@ class Calculation:
             if data['volatility'] > 0:
                 data['distribution'] +=1
         return data
+
