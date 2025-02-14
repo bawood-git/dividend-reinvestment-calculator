@@ -11,7 +11,7 @@ from pymongo import MongoClient
 
 # Flask
 from flask_bootstrap import Bootstrap5
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, make_response
 from flask_session import Session
 from flask_wtf import FlaskForm, CSRFProtect
 from wtforms import Form, validators, StringField, DecimalField, IntegerField, SelectField, SubmitField 
@@ -67,10 +67,46 @@ def getSentimentScore(symbol):
 @app.route('/', methods=['GET'])
 def index():
     tab_div_header = render_template("tab_div_header.jinja")
+
     return render_template('index.jinja', header=tab_div_header), 200, {'ContentType':'text/html; charset=utf-8'} 
+
+@app.route('/settings', methods=['GET','POST'])
+def settings():
+    tab_div_header = render_template("tab_div_header.jinja")
+
+    if 'GET' == request.method:
+        # Init settings
+        settings = {
+            "shares_owned"  : request.cookies.get('shares_owned'),
+            "term"          : request.cookies.get('term'),
+            "frequency"     : request.cookies.get('frequency'),
+            "contribution"  : request.cookies.get('contribution'),
+            "purchase_mode" : request.cookies.get('purchase_mode'),
+        }
+        return render_template('settings.jinja', header=tab_div_header, settings=settings), 200, {'ContentType':'text/html; charset=utf-8'} 
+
+    if 'POST' == request.method:
+        # Init settings
+        form_settings = {
+            "shares_owned"  : request.form.get('shares_owned'),
+            "term"          : request.form.get('term'),
+            "frequency"     : request.form.get('frequency'),
+            "contribution"  : request.form.get('contribution'),
+            "purchase_mode" : request.form.get('purchase_mode'),
+        }
+
+        response = make_response(render_template('settings.jinja', header=tab_div_header, settings=form_settings), 200, {'ContentType':'text/html; charset=utf-8'})
+        
+        for k, v in form_settings.items():
+            response.set_cookie(k, v)
+        return response 
+        
+
+
 
 @app.route('/search', methods=['POST'])
 def search():
+
     symbol = request.form.get('symbol')
     
     if 'POST' == request.method:
@@ -101,13 +137,13 @@ def search():
             config = {
                 "stock_symbol"  : symbol,
                 "share_price"   : quote['Global Quote']['05. price'],  
-                "shares_owned"  : 100,                 
+                "shares_owned"  : request.cookies.get('shares_owned'),              
                 "distribution"  : dividend['amount'],   
-                "term"          : 20,                    
-                "contribution"  : 0.00,
+                "term"          : request.cookies.get('term'),                    
+                "contribution"  : request.cookies.get('contribution'),
                 "volatility"    : overview['Beta'],                 
-                "frequency"     : "Quarterly",
-                "purchase_mode" : "Whole",
+                "frequency"     : request.cookies.get('frequency'), #FIXME Should be fetched/calculated
+                "purchase_mode" : request.cookies.get('purchase_mode'),
             }
         
             tab_div_profile = render_template('tab_div_profile.jinja', quote=quote, dividend=dividend, overview=overview, sentiment=sentiment)
@@ -275,6 +311,11 @@ def report():
         
     #except Exception as e:
     #    return e, 200, {'ContentType':'text/html; charset=utf-8'}
+
+@app.route('/help', methods=['GET'])
+def help():
+    #FIXME
+    return f'TODO: Add help logic and information after completing design.'
 
 @app.route('/history/', methods=['GET','POST'])
 def history():
