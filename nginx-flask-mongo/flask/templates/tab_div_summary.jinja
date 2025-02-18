@@ -22,8 +22,12 @@
                 <th style="padding-top:3%; border-bottom: 1px solid black;" colspan="2">Assets</th>
             </tr>
             <tr>
-                <th>Asset Growth</th>
-                <td style="text-align: left;">{{"{:,.3f}".format(totals['pct_growth'])}}%</td>
+                <th>Avg Growth PP</th>
+                <td style="text-align: left;">{{"{:,.3f}".format(totals['asset_growth_avg'])}}%</td>
+            </tr>
+            <tr>
+                <th>Total Growth</th>
+                <td style="text-align: left;">{{"{:,.3f}".format(totals['asset_growth_tot'])}}%</td>
             </tr>
             <tr>
             <tr>
@@ -41,20 +45,24 @@
                 <th style="padding-top:3%; border-bottom: 1px solid black;" colspan="2">Dividends</th>
             </tr>
             <tr>
-                <th>Distribution Growth</th>
-                <td style="text-align: left;">{{"{:,.2f}".format(totals['distribution_growth'])}}%</td>
-            </tr>
-            <tr>
-                <th>Starting Distribution</th>
+                <th>Initial Dividend</th>
                 <td style="text-align: left;">{{"${:,.2f}".format(totals['starting_distribution'])}}</td>
             </tr>
             <tr>
-                <th>Ending Distribution</th>
+                <th>Final Dividend</th>
                 <td style="text-align: left;">{{"${:,.2f}".format(totals['ending_distribution'])}}</td>
             </tr>
             <tr>
                 <th>Total Reinvested</th>
                 <td style="text-align: left;">{{"${:,.2f}".format(totals['total_reinvested'])}}</td>
+            </tr>
+            <tr>
+                <th>Avg. Growth PP</th>
+                <td style="text-align: left;">{{"{:,.2f}".format(totals['distribution_growth_avg'])}}%</td>
+            </tr>
+            <tr>
+                <th>Total Growth</th>
+                <td style="text-align: left;">{{"{:,.2f}".format(totals['distribution_growth_tot'])}}%</td>
             </tr>
         </table>
     </div>

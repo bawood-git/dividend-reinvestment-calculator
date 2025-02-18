@@ -2,47 +2,43 @@
     <table width="100%">
         <tr>
             <td><span class="tabTitle">Company Profile</span></td>
-            <td style="text-align: right;"><a href="{{url_for('news',symbol=quote['Global Quote']['01. symbol'])}}" target="_blank">News</a></td>
+            <td style="text-align: right;"><a href="{{url_for('news',symbol=model.profile['stock_symbol'])}}" target="_blank">News</a></td>
         </tr>
     </table>
     <div class="divInnerContent" style="height: 300px;">
             <table width="100%">
                 <tr>
                     <tr>
+                        <th>Sentiment</th>
+                        <td>{{model.sentiment}}</td>
+                    </tr>
+                    <tr>
                         <th>Ticker</th>
-                        <td>{{quote['Global Quote']['01. symbol']}}</td>
+                        <td>{{model.profile['stock_symbol']}}</td>
                     </tr>
                     <tr>
                         <th>Name</th>
-                        <td>{{overview['Name']}}</td>
+                        <td>{{model.profile['company_name']}}</td>
                     </tr>
                     <tr>
                         <th>Description</th>
-                        <td>{{overview['Description']}}</td>
+                        <td>{{model.profile['company_desc']}}</td>
                     </tr>
                     <tr>
                         <th>Site</th>
-                        <td>{{overview['OfficialSite']}}</td>
+                        <td>{{model.profile['company_website']}}</td>
                     </tr>
                     <tr>
                         <th>Sector</th>
-                        <td>{{overview['Sector']}}</td>
+                        <td>{{model.profile['stock_sector']}}</td>
                     </tr>
                     <tr>
                         <th>Industry</th>
-                        <td>{{overview['Industry']}}</td>
-                    </tr>
-                    <tr>
-                        <th>Country</th>
-                        <td>{{overview['Country']}}</td>
+                        <td>{{model.profile['stock_industry']}}</td>
                     </tr>
                     <tr>
                         <th>Exchange</th>
-                        <td>{{overview['Exchange']}}</td>
-                    </tr>
-                    <tr>
-                        <th>Sentiment</th>
-                        <td>{{sentiment}}</td>
+                        <td>{{model.profile['exchange']}}</td>
                     </tr>
                 </tr>
             </table>

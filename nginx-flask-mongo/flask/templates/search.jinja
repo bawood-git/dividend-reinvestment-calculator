@@ -5,16 +5,17 @@
         <meta charset="UTF-8">
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     </head>
+    <title>DivCalc Search</title>
     <body>
         <div class="page">
             {{header|safe}}
             <table width="100%">
                 <tr style="padding-top: 15px;">
                     <td style="width: 600px; padding-right: 15px; padding-top: 15px;">{{profile|safe}}</td>
-                    <td style="padding-top: 15px;">{{metrics|safe}}</td>
+                    <td style="padding-top: 15px;">{{finance|safe}}</td>
                 </tr>
                 <tr>
-                    <td colspan="2"  style="padding-top: 15px;">{{config|safe}}</td>
+                    <td colspan="2" style="padding-top: 15px;">{{settings|safe}}</td>
                 </tr>
             </table>
         </div>

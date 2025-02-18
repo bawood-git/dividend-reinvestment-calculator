@@ -5,8 +5,8 @@
     --heading:            #FFFCF2;
     --link:               #FFFCF2;
     --link-hover:         #28deeb;
-    --background:         #88746d;    /* Page background */
-    --div-border:         #5a6778;    /* Widget border */
+    --background:         #8b7770;    /* Page background */
+    --div-border:         rgba(169, 169, 169, 0.75);    /* Widget border */
     --div-content:        #6a7e95;    /* Widget container background */
     --div-content-border: #5a6778;    /* Widget border */
     --tbl-content:        White;      /* Widget information panel background with alpha */
@@ -16,14 +16,14 @@
   .page {
     text-align:       center;
     margin:           auto;
-    width:            1200px;
-    padding:          10px;
+    width:            1280px;
   }
     
   body {
     font-family:      Verdana;
     color:            var(--text);
     background-color: var(--background);
+    background-image: linear-gradient(to right, #1c1f24, #272b31, #32383f, #3e454e, #4a525d, #3e454e, #32383f, #272b31, #1c1f24);
   }  
   
   a {
@@ -36,17 +36,23 @@
     color:            var(--link-hover);
   }
   
+  .inputTip{
+    height:           15px;
+    margin-left:      3px;  
+  }
+
   .inputText {
     font-size:        medium;
     padding:          8px;
     width:            100px;
-    border:           none;
+    border:           1px solid var(--div-border);
     border-radius:    5px;
     outline:          none;
+
   }
 
   .inputText:hover {
-    box-shadow:       0 8px 16px rgba(0,0,0,0.4);
+    border:           1px solid blue;
   }
 
   .inputSearchText {
@@ -57,6 +63,7 @@
     outline:          none;
     text-transform:   uppercase;
   }
+  
   .inputSearchText:-webkit-autofill {
     
     -webkit-text-fill-color: black;
@@ -67,29 +74,33 @@
     font-size:        medium;
     padding:          10px;
     width:            75px;
-    border:           none;
+    border:           1px solid var(--div-border);
     border-radius:    10px;
-    box-shadow:       0 4px 8px rgba(0,0,0,0.2);
   }
 
   .inputButton:hover {
-    box-shadow:       0 8px 16px rgba(0,0,0,0.4);
+    border:           1px solid blue;
   }
+
   .inputButton:active {
-    transform: translateY(4px)
+    transform: translateY(2px)
   }
   
   select {
     font-size:        medium;
     padding:          8px;
-    width:            150px;
-    border:           none;
+    width:            140px;
+    border:           1px solid var(--div-border);
     border-radius:    5px;
     outline:          none;
   }
 
+  select:focus {
+    border:           1px solid blue;
+  }
+
   select:hover {
-    box-shadow:       0 8px 16px rgba(0,0,0,0.4);
+    border:           1px solid blue;
   }
   
   .heading {
@@ -112,6 +123,7 @@
   .divContent {
     padding:          10px;
     background-color: var(--div-content);
+    background-image: linear-gradient(to right, #4a515c, #4d5560, #535c68, #56606c, #535c68, #505864, #4d5560, #4a515c);    
     border-radius:    15px;
     border:           1px solid var(--div-border);
     text-align:       left;
@@ -155,6 +167,7 @@
     color:            var(--tbl-heading);
     white-space:      nowrap;
     vertical-align:   top;
+    text-align:       left;
   }
   
   td {
@@ -181,10 +194,41 @@
 
   .rptHeader {
     color:            var(--tbl-rpt-txt);
-
   }
 
   .rptRow {
     color:            var(--tbl-rpt-txt);
+  }
 
+  .tooltip {
+    position:         relative;
+    display:          inline-block;
+    border-bottom:    1px dotted black;
+  }
+  
+  .tooltip .tooltiptext {
+    visibility:       hidden;
+    width:            225px;
+    height:           40px;
+    background-color: #4e4e4e;
+    color:            #ffffff;
+    border-radius:    5px;
+    padding:          5px;
+    position:         absolute;
+    z-index:          1;
+    opacity:          0;
+    transition:       opacity 0.3s;
+  }
+  
+  .tooltip .tooltiptext::after {
+    content:          "";
+    position:         absolute;
+    border-width:     5px;
+    border-style:     solid;
+    border-color:     #555 transparent transparent transparent;
+  }
+  
+  .tooltip:hover .tooltiptext {
+    visibility:       visible;
+    opacity:          1;
   }

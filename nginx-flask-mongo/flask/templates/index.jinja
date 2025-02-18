@@ -5,17 +5,25 @@
         <meta charset="UTF-8">
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     </head>
+    <title>DivCalc Home</title>
     <body>
         <div class="page">
             {{header|safe}}
         </div>
         <div style="text-align: center; ">
-            <div class="divContent" style="height: 405px; width: 725px; margin:auto">
-                <span class="tabTitle">Disclaimer</span>
-                <div class="divInnerContent" style="height: 350px; width: 700px; margin:auto;">
+            <br>
+            <div class="divContent" style="width: 1250px; margin:auto">
+                <table width="100%">
+                    <tr>
+                        <td><span class="tabTitle">Disclaimer</span></td>
+                    </tr>
+                </table>            
+                <div class="divInnerContent" style="width: 1225px; margin:auto;">
                     <p>Hey, thanks for trying me out. </p>
                     <p>One quick note - this software is experimental at best and not intended to predict outcomes of future trades. Caviat emptor to the max. </p>
                     <p>Now, go plug in a stock symbol in the search bar, located in the upper right corner of the page.</p>
+                    <p>
+                    </p>
                 </div>
             </div>
         </div>

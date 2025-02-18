@@ -1,0 +1,44 @@
+<div class="divContent">
+    <table width="100%">
+        <tr>
+            <td><span class="tabTitle">Financial Metrics</span></td>
+            <td style="text-align: right;"><a href="" target="_blank">History</a></td>
+        </tr>
+    </table>
+    <div class="divInnerContent" style="height: 300px;">
+        <table>
+            <tr>
+                <th>Current Price</th>
+                <td>{{model.financials['stock_price']}}</td>
+            </tr>
+            <tr>
+                <th>Book Value</th>
+                <td>{{model.financials['book_value']}}</td>
+            </tr>
+            <tr>
+                <th>Beta</th>
+                <td>{{model.financials['beta']}}</td>
+            </tr>
+            <tr>
+                <th>Annual Yield</th>
+                <td>{{model.financials['annual_yield']}}</td>
+            </tr>
+            <tr>
+                <th>Dividend Amount</th>
+                <td>{{model.financials['dividend']}}</td>
+            </tr>
+            <tr>
+                <th>Declaration Date</th>
+                <td>{{model.financials['dec_date']}}</td>
+            </tr>
+            <tr>
+                <th>Record Date</th>
+                <td>{{model.financials['rcd_date']}}</td>
+            </tr>
+            <tr>
+                <th>Distibuted Date</th>
+                <td>{{model.financials['pay_date']}}</td>
+            </tr>
+        </table>
+    </div>
+</div>

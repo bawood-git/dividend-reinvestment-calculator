@@ -5,60 +5,14 @@
         <meta charset="UTF-8">
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     </head>
-    <title>DRC:Settings</title>
+    <title>DivCalc Settings</title>
     <body>
         <div class="page">
             {{header|safe}}
         </div>
-        <div style="text-align: center; ">
-            <div class="divContent" style="width: 1180px; margin:auto">
-                <table width="100%">
-                    <tr>
-                        <td><span class="tabTitle">Model Defaults</span></td>
-                        <td style="text-align: right;"><a href="{{ url_for('help') }}" target="_blank">Help</a></td>
-                    </tr>
-                </table>            
-                <div class="divInnerContent" style=" width: 1140px; margin:auto;">
-                    <form form action="{{ url_for('settings') }}" method="post" name="settingsForm" id="settingsForm">
-                        <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
-                        <table width="100%">
-                            <tr>
-                                <th>Reinvestment Form Defaults:</th>
-                            </tr>
-                            <tr>
-                                <th>Quantity</th>
-                                <th>No. Periods</th>
-                                <th>Frequency</th>
-                                <th>Contributions</th>
-                                <th>Purchase Mode</th>
-                            </tr>
-                            <tr>
-                                <td><input type="text" class="inputText" autocomplete="off" name="shares_owned" value="{{settings['shares_owned']}}"></td>
-                                <td><input type="text" class="inputText" autocomplete="off" name="term" value="{{settings['term']}}"></td>
-                                <td>
-                                    <select name="frequency">
-                                        <option value="Monthly"     {% if "Monthly"    == settings['frequency'] %} selected {% endif %}> Monthly</option>
-                                        <option value="Quarterly"   {% if "Quarterly"  == settings['frequency'] %} selected {% endif %}> Quarterly</option>
-                                        <option value="Semiannual"  {% if "Semiannual" == settings['frequency'] %} selected {% endif %}> Semiannual</option>
-                                        <option value="Annual"      {% if "Annual"     == settings['frequency'] %} selected {% endif %}> Annual</option>
-                                    </select>
-                                </td>
-                                <td><input type="text" autocomplete="off" class="inputText" name="contribution" value="{{settings['contribution']}}"></td>
-                                <td>
-                                    <select name="purchase_mode">
-                                        <option value="Fractional" {% if "Fractional" == settings['purchase_mode'] %}  selected {% endif %}>Fractional</option>
-                                        <option value="Whole"      {% if "Whole"      == settings['purchase_mode'] %}  selected {% endif %}>Whole Shares</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><input type="submit" name="saveSettings" class="inputButton" value="Save"></td>
-                            </tr>
-                        
-                        </table>
-                    </form>
-                </div>
-            </div>
+        <div style="text-align: center;">
+            <br>
+            {{content|safe}}
         </div>
     </body>
 </html>

@@ -40,18 +40,21 @@ Chart.register({
             yAxisID:         'y1',
             label:           'Income',
             data:            {{ income }},
-            type:            'line',
-            borderColor:     '#DD5746',
+            type:            'bar',
             fill:            false,
             
         },
         {
             yAxisID:         'y2',
+            label:           'Price',
+            data:            {{ price }},
+            type:            'bubble',
+        },
+        {
+            yAxisID:         'y3',
             label:           'Assets',
             data:            {{ assets }},
-            type:            'bar',
-            borderColor:     '#4793AF',
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            type:            'line',
         },
         ]
                 },
@@ -74,6 +77,22 @@ Chart.register({
                 y1: {
                     type:'linear',
                     position:'left',
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                    ticks: {
+                        color: 'white',
+                            callback: function(value, index, ticks) {
+                                return '$' + value;
+                            }
+                    }
+                },
+                y3: {
+                    type:'logarithmic',
+                    position:'right',
+                    grid: {
+                        drawOnChartArea: false,
+                    },
                     ticks: {
                         color: 'white',
                             callback: function(value, index, ticks) {
@@ -82,10 +101,10 @@ Chart.register({
                     }
                 },
                 y2: {
-                    type:'logarithmic',
-                    position:'right',
+                    type:'linear',
+                    position:'left',
                     grid: {
-                        drawOnChartArea: false, // Use left ticks
+                        drawOnChartArea: false,
                     },
                     ticks: {
                         color: 'white',
@@ -93,8 +112,7 @@ Chart.register({
                                 return '$' + value;
                             }
                     }
-                }
-            },
+                }            },
             chartArea: {
 					backgroundColor: 'white'
 			}

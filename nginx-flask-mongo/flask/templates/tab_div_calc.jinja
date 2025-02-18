@@ -1,0 +1,37 @@
+<div class="divContent">
+    <table width="100%">
+        <tr>
+            <td><span class="tabTitle">Configure Model Parameters</span></td>
+            <td style="text-align: right;"><a href="" target="_blank">Help</a></td>
+        </tr>
+    </table>
+    <div class="divInnerContent" style="height: 75px;">
+        <form action="{{ url_for('report') }}" method="post" name="reportForm" id="reportForm">
+            <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
+            {{form.stock_symbol}}
+            {{form.share_price}}
+            <table width="100%">
+                <tr style="text-align: center;">
+                    <th>Initial Shares</th>
+                    <th>Dividend      </th>
+                    <th>Periods       </th>
+                    <th>Frequency     </th>
+                    <th>Contributions </th>
+                    <th>Volatility    </th>
+                    <th>Reinvest Mode </th>
+                    <th>&nbsp;</th>
+                </tr>
+                <tr style="text-align: center;">
+                    <td>{{ form.shares_owned(autocomplete="off", class="inputText") }}</td>
+                    <td>{{ form.distribution(autocomplete="off", class="inputText") }}</td>
+                    <td>{{ form.term(autocomplete="off", class="inputText") }}</td>
+                    <td>{{ form.frequency(autocomplete="off") }}</td>
+                    <td>{{ form.contribution(autocomplete="off", class="inputText") }}</td>
+                    <td>{{ form.volatility(autocomplete="off", class="inputText") }}</td>
+                    <td>{{ form.purchase_mode(autocomplete="off") }}</td>
+                    <td>{{ form.run(class="inputButton") }}</td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
