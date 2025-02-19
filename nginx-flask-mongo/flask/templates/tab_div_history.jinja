@@ -1,0 +1,28 @@
+{% from 'bootstrap5/form.html' import render_form %}
+<div class="divContent">
+    <table width="100%">
+        <tr>
+            <td><span class="tabTitle">Dividend History</span></td>
+            <td style="text-align: right;"><a href="" target="_blank"></a></td>
+        </tr>
+    </table>
+    <div class="divInnerContent" style="height:387px">
+        <table>
+                <tr>
+                    <th>Amt.</th>
+                    <th>Declare</th>
+                    <th>Record</th>
+                    <th>Issue</th>
+                </tr>
+            {% for d in model.dividend_history %}
+                <tr>
+                    <td>{{d['amount']}}</td>
+                    <td>{{d['declaration_date']}}</td>
+                    <td>{{d['record_date']}}</td>
+                    <td>{{d['payment_date']}}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+

@@ -1,0 +1,86 @@
+<div class="divContent" style="width: 800px;">
+    <table width="100%">
+        <tr>
+            <td><span class="tabTitle">Dividend Performance</span></td>
+        </tr>
+    </table>
+     <div class="divInnerContent">
+        <canvas id="history_chart"></canvas>
+    </div>
+</div>
+
+<script>
+Chart.register({
+    id: 'bgFill',
+			beforeDraw: function (chart, easing) {
+				if (chart.config.options.chartArea && chart.config.options.chartArea.backgroundColor) {
+					var helpers = Chart.helpers;
+					var ctx = chart.ctx;
+					var chartArea = chart.chartArea;
+
+					ctx.save();
+					ctx.fillStyle = chart.config.options.chartArea.backgroundColor;
+					ctx.fillRect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
+					ctx.restore();
+				}
+			}
+		});
+
+    const ctx = document.getElementById('history_chart').getContext('2d');
+    const labels = {{ labels }}
+    const y1data = {{ amount }}        
+    const divChart = new Chart(ctx, {
+
+    data: {
+        labels: labels,
+        datasets: [
+            {
+                yAxisID:         'y',
+                label:           'Dividend Amount',
+                data:            y1data,
+                type:            'bar',
+            }
+        ],
+        options: {
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'white',
+                    }                    
+                }
+            },
+        },
+        responsive: false,
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Term (Periods)',
+                    color: 'white'
+                },
+                ticks: {
+                    color: 'white',
+                }
+            },
+            y: {
+                type:'logarithmic',
+                position:'right',
+                grid: {
+                    drawOnChartArea: false,
+                },
+                title: {
+                    display: true,
+                    text: 'Dividend',
+                    color: 'white'
+                },
+                ticks: {
+                    color: 'white',
+                        callback: function(value, index, ticks) {
+                            return '$' + value;
+                        }
+                }
+            },
+        },
+    }
+});
+</script>

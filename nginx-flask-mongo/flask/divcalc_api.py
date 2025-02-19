@@ -25,7 +25,8 @@ class AlphaVantage:
     def getDividendHistory(self, symbol):
         url = f'https://www.alphavantage.co/query?function=DIVIDENDS&symbol={symbol}&apikey={self.key}'
         r = requests.get(url)
-        return r.json()
+        d = r.json()
+        return d['data']
 
     def getNewsSentiment(self, symbol):
         url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={symbol}&apikey={self.key}'
@@ -73,7 +74,7 @@ class DataModel:
                 return None
 
             dividends   = api_functions.getDividendHistory(symbol)
-            dividend    = dividends['data'][0]
+            dividend    = dividends[0]
             quote       = api_functions.getQuote(symbol)
             news        = api_functions.getNewsSentiment(symbol)
 
@@ -86,8 +87,8 @@ class DataModel:
                 "stock_industry"    : overview['Industry'],
                 "exchange"          : overview['Exchange'],
             }
-
-            self.dividend_history = dividends
+            
+            self.dividend_history = [d for d in dividends if len(d['payment_date']) == 10]
             
             self.financials = {
                 "dividend"          : dividend['amount'],

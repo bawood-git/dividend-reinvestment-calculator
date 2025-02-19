@@ -92,6 +92,8 @@ def report():
                                           model = data_model)
         tab_div_finance = render_template('tab_div_financial.jinja', 
                                           model = data_model)
+        tab_div_history = render_template('tab_div_history.jinja',   
+                                          model = data_model)
         tab_div_calc    = render_template('tab_div_calc.jinja', 
                                           form  = settings_form, 
                                           data  = data_model)
@@ -196,7 +198,22 @@ def report():
             report.append(row_data)
             rows.append(render_template('dividend_row.jinja', **row_data))
         
+        # Roll up Report Summary totals not in loop
+        match frequency:
+            case 'Monthly':
+                income_sequence = 12
+            case 'Quarterly':
+                income_sequence = 4
+            case 'Semiannual':
+               income_sequence = 2
+            case 'Annual':
+               income_sequence = 1
+                 
+                        
         totals['periods'] = p
+        totals['years_vested'] = term / income_sequence
+        
+        
         totals['shares_owned'] = shares_owned
         
         totals['ending_distribution'] = distribution * shares_owned
@@ -207,38 +224,53 @@ def report():
         totals['asset_growth_tot'] = 100 * (totals['ending_assets'] / totals['starting_assets'])
         totals['asset_growth_avg'] = totals['asset_growth_tot'] / term
 
-        match frequency:
-            case 'Monthly': 
-                totals['years_vested'] = term /12
-            case 'Quarterly':
-                totals['years_vested'] = term /4
-            case 'Semiannual':
-                totals['years_vested'] = term /2
-            case 'Annual':
-                totals['years_vested'] = term
+        
+        totals['income_annual'] =  (distribution * shares_owned) * income_sequence
+        totals['income_monthly'] = totals['income_annual'] / 12
+
+        
+        
         summary = render_template('tab_div_summary.jinja', totals=totals)
 
-# Roll up chart data    
+# Roll up chart data
+
+        # History
+        div_history_labels = []
+        div_history_amount = []
+            
+        for d in data_model.dividend_history:
+            div_history_labels.append(d['payment_date'])
+            div_history_amount.append(d['amount'])
+                
+        #labels = [ d for d in data_model.dividend_history[0]]
+        #y1     = [ d for d in data_model.dividend_history[1]]
+        tab_div_chart_hist = render_template('tab_div_chart_hist.jinja',
+                                labels = div_history_labels, 
+                                amount = div_history_amount)        
+  
+        # Simulation
         i = len(report)
         cols = [i for i in range(1, i +1)]
         income = [float(r.get('income').replace('$','').replace(',','')) for r in report]
         assets = [r.get('asset_value') for r in report]
         price  = [r.get('price') for r in report]
-        tab_div_chart = render_template('tab_div_chart.jinja',
+        tab_div_chart_sim = render_template('tab_div_chart_sim.jinja',
                                 labels = cols, 
                                 income = income,
                                 assets = assets,
-                                price  = price,
-                                        )        
+                                price  = price)        
+
 # Roll up report
         return render_template('report.jinja', 
-                                header=tab_div_header, 
-                                profile=tab_div_profile, 
-                                metrics=tab_div_finance, 
-                                config=tab_div_calc, 
-                                rows=rows, 
-                                summary=summary,
-                                chart=tab_div_chart,
+                                header     = tab_div_header,        # Widget
+                                profile    = tab_div_profile,       # Widget
+                                metrics    = tab_div_finance,       # Widget
+                                history    = tab_div_history,       # Widget
+                                config     = tab_div_calc,          # Widget
+                                rows       = rows,                  # Data? FIXME
+                                summary    = summary,               # Data? FIXME
+                                chart_hist = tab_div_chart_hist,    # Widget    
+                                chart_sim  = tab_div_chart_sim,     # Widget
                                 ticker=data_model.profile['stock_symbol']
                                 ), 200, {'ContentType':'text/html; charset=utf-8'}
         
@@ -284,17 +316,36 @@ def search():
             settings_form.contribution.data  = Decimal(request.cookies.get('contribution'))
             settings_form.volatility.data    = Decimal(data_model.financials['beta'])
             settings_form.purchase_mode.data = request.cookies.get('purchase_mode')            
-        
+
+            # Chart Stuff
+            labels = []
+            amount = []
+            
+            for d in data_model.dividend_history:
+                labels.append(d['payment_date'])
+                amount.append(d['amount'])
+                
+            #labels = [ d for d in data_model.dividend_history[0]]
+            #y1     = [ d for d in data_model.dividend_history[1]]
+            
+            
+            # Create widgets
             tab_div_profile = render_template('tab_div_profile.jinja',   model=data_model)
             tab_div_finance = render_template('tab_div_financial.jinja', model=data_model)
+            tab_div_history = render_template('tab_div_history.jinja',   model=data_model)
+            tab_div_chart   = render_template('tab_div_chart_hist.jinja', 
+                                               labels = labels,
+                                               amount = amount
+                                               )
             tab_div_calc    = render_template('tab_div_calc.jinja',      form=settings_form, data=data_model)
 
             return render_template('search.jinja', 
-                                   header   =tab_div_header, 
-                                   profile  =tab_div_profile, 
-                                   finance  =tab_div_finance, 
-                                   settings =tab_div_calc,
-                                   
+                                   header   = tab_div_header, 
+                                   profile  = tab_div_profile, 
+                                   finance  = tab_div_finance,
+                                   history  = tab_div_history,
+                                   settings = tab_div_calc,
+                                   chart    = tab_div_chart
                                    ), 200, {'ContentType':'text/html; charset=utf-8'}
 
 @app.route('/settings', methods=['GET','POST'])

@@ -4,6 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     </head>
     <title>DivCalc Search</title>
     <body>
@@ -13,6 +14,12 @@
                 <tr style="padding-top: 15px;">
                     <td style="width: 600px; padding-right: 15px; padding-top: 15px;">{{profile|safe}}</td>
                     <td style="padding-top: 15px;">{{finance|safe}}</td>
+                </tr>
+                <tr>
+                    <td style="width: 600px; padding-right: 15px; padding-top: 15px;">
+                        {{chart|safe}}
+                    </td>
+                    <td style="padding-top: 15px;">{{history|safe}}</td>
                 </tr>
                 <tr>
                     <td colspan="2" style="padding-top: 15px;">{{settings|safe}}</td>
