@@ -69,6 +69,11 @@ Chart.register({
             responsive: true,
             scales: {
                 x: {
+                    title: {
+                        display: true,
+                        text: 'Term (Periods)',
+                        color: 'white'
+                    },
                     ticks: {
                         color: 'white',
                             }
@@ -80,6 +85,11 @@ Chart.register({
                     grid: {
                         drawOnChartArea: false,
                     },
+                    title: {
+                        display: true,
+                        text: 'Dividend',
+                        color: 'white'
+                    },
                     ticks: {
                         color: 'white',
                             callback: function(value, index, ticks) {
@@ -88,10 +98,15 @@ Chart.register({
                     }
                 },
                 y3: {
-                    type:'logarithmic',
+                    type:'linear',
                     position:'right',
                     grid: {
                         drawOnChartArea: false,
+                    },
+                    title: {
+                        display: true,
+                        text: 'Asset Value',
+                        color: 'white'
                     },
                     ticks: {
                         color: 'white',
@@ -106,10 +121,15 @@ Chart.register({
                     grid: {
                         drawOnChartArea: false,
                     },
+                    title: {
+                        display: true,
+                        text:    'Stock Price',
+                        color:   'white'
+                    },
                     ticks: {
                         color: 'white',
                             callback: function(value, index, ticks) {
-                                return '$' + value;
+                                return '$' + value.toFixed(2);
                             }
                     }
                 }            },
