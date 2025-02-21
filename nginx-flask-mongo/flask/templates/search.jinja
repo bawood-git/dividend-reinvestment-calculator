@@ -4,25 +4,29 @@
     <head>
         <meta charset="UTF-8">
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
+
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     </head>
     <title>DivCalc Search</title>
     <body>
         <div class="page">
-            {{header|safe}}
+            {{ header }}
+            
             <table width="100%">
+                <tr>
+                    <td colspan="2" style="padding-top: 15px;">{{ settings }}</td>
+                </tr>
                 <tr style="padding-top: 15px;">
-                    <td style="width: 600px; padding-right: 15px; padding-top: 15px;">{{profile|safe}}</td>
-                    <td style="padding-top: 15px;">{{finance|safe}}</td>
+                    <td style="width: 600px; padding-right: 15px; padding-top: 15px;">{{ profile }}</td>
+                    <td style="padding-top: 15px;">{{ finance }}</td>
                 </tr>
                 <tr>
                     <td style="width: 600px; padding-right: 15px; padding-top: 15px;">
-                        {{chart|safe}}
+                        {{ chart }}
                     </td>
-                    <td style="padding-top: 15px;">{{history|safe}}</td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="padding-top: 15px;">{{settings|safe}}</td>
+                    <td style="padding-top: 15px;">{{ history }}</td>
                 </tr>
             </table>
         </div>

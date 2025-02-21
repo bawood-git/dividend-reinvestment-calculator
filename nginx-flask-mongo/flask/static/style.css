@@ -16,7 +16,7 @@
   .page {
     text-align:       center;
     margin:           auto;
-    width:            1280px;
+    width:            1380px;
   }
     
   body {
@@ -44,7 +44,7 @@
   .inputText {
     font-size:        medium;
     padding:          8px;
-    width:            100px;
+    width:            125px;
     border:           1px solid var(--div-border);
     border-radius:    5px;
     outline:          none;

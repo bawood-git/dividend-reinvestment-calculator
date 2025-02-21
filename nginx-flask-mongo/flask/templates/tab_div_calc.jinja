@@ -12,21 +12,22 @@
             {{form.share_price}}
             <table width="100%">
                 <tr style="text-align: center;">
-                    <th>Initial Shares</th>
-                    <th>Dividend      </th>
-                    <th>Periods       </th>
-                    <th>Frequency     </th>
-                    <th>Contributions </th>
-                    <th>Volatility    </th>
-                    <th>Reinvest Mode </th>
-                    <th>&nbsp;</th>
+                    <th>Initial Capital  </th>
+                    <th>Recurring Capital</th>
+                    <th>Shares Owned     </th>
+                    <th>Dividend         </th>
+                    <th>Periods          </th>
+                    <th>Frequency        </th>
+                    <th>Volatility       </th>
+                    <th>Reinvest Mode    </th>
                 </tr>
                 <tr style="text-align: center;">
+                    <td>{{ form.initial_capital(autocomplete="off", class="inputText") }}</td>
+                    <td>{{ form.contribution(autocomplete="off", class="inputText") }}</td>
                     <td>{{ form.shares_owned(autocomplete="off", class="inputText") }}</td>
                     <td>{{ form.distribution(autocomplete="off", class="inputText") }}</td>
                     <td>{{ form.term(autocomplete="off", class="inputText") }}</td>
                     <td>{{ form.frequency(autocomplete="off") }}</td>
-                    <td>{{ form.contribution(autocomplete="off", class="inputText") }}</td>
                     <td>{{ form.volatility(autocomplete="off", class="inputText") }}</td>
                     <td>{{ form.purchase_mode(autocomplete="off") }}</td>
                     <td>{{ form.run(class="inputButton") }}</td>
