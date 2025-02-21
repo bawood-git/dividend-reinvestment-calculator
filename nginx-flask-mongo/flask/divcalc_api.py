@@ -70,13 +70,14 @@ class DataModel:
                 api_functions = AlphaVantage(api_config.config)
             
             overview = api_functions.getOverview(symbol)
-            if overview == {}:
+            if overview == None or len(overview) == 0:
                 return None
 
-            dividends   = api_functions.getDividendHistory(symbol)
-            dividend    = dividends[0]
-            quote       = api_functions.getQuote(symbol)
-            news        = api_functions.getNewsSentiment(symbol)
+            # Historical is ordered newest -> oldest 
+            dividends = api_functions.getDividendHistory(symbol)
+            dividend  = dividends[0]
+            quote     = api_functions.getQuote(symbol)
+            news      = api_functions.getNewsSentiment(symbol)
 
             self.profile = {
                 "stock_symbol"      : symbol,
@@ -88,18 +89,19 @@ class DataModel:
                 "exchange"          : overview['Exchange'],
             }
             
+            # Some records have missing fields
             self.dividend_history = [d for d in dividends if len(d['payment_date']) == 10]
             
             self.financials = {
-                "dividend"          : dividend['amount'],
+                "dividend"          : float(dividend['amount']),
                 "dec_date"          : dividend['declaration_date'],
                 "rcd_date"          : dividend['record_date'],
                 "pay_date"          : dividend['payment_date'],
-                "annual_yield"      : overview['DividendYield'],
-                "stock_price"       : quote['05. price'],
+                "annual_yield"      : float(overview['DividendYield']),
+                "stock_price"       : float(quote['05. price']),
                 "target_price"      : overview['AnalystTargetPrice'],
-                "book_value"        : overview['BookValue'],
-                "beta"              : overview['Beta'],
+                "book_value"        : float(overview['BookValue']),
+                "beta"              : float(overview['Beta']),
             }
 
             self.articles           = news

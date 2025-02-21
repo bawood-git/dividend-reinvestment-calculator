@@ -1,11 +1,11 @@
-<div class="divContent" style="width: 1250px; margin:auto">
+<div class="divContent" style="width: 1355px; margin:auto">
     <table style="width: 100%;">
         <tr style="height: 30px;;">
             <td style="vertical-align:top;"><span class="tabTitle">Model Defaults</span></td>
             <td style="text-align: right;"><a href="{{ url_for('help') }}" target="_blank">Help</a></td>
         </tr>
     </table>            
-    <div class="divInnerContent" style=" width: 1225px; margin:auto;">
+    <div class="divInnerContent" style=" width: 1330px; margin:auto;">
         <form form action="{{ url_for('settings') }}" method="post" name="settingsForm" id="settingsForm">
             <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
             <table>
@@ -13,17 +13,20 @@
                     <th colspan="5">Reinvestment Form Defaults:</th>
                 </tr>
                 <tr>
-                    <th>Initial Shares </th>
+                    <th>Initial Capital</th>
+                    <th>Recurring Capital</th>
+                    <th>Shares Owned   </th>
+                    <th>Contributions  </th>
                     <th>Periods        </th>
                     <th>Frequency      </th>
-                    <th>Contributions  </th>
                     <th>Reinvest Mode  </th>
                 </tr>
                 <tr>
-                    <td>{{ settings.shares_owned(class="inputText", autocomplete="off") }}</td>
-                    <td>{{ settings.term(class="inputText", autocomplete="off") }}</td>
+                    <td>{{ settings.initial_capital(autocomplete="off", class="inputText") }}</td>
+                    <td>{{ settings.contribution(autocomplete="off", class="inputText") }}</td>
+                    <td>{{ settings.shares_owned(autocomplete="off", class="inputText") }}</td>
+                    <td>{{ settings.term(autocomplete="off", class="inputText") }}</td>
                     <td>{{ settings.frequency(autocomplete="off") }}</td>
-                    <td>{{ settings.contribution(class="inputText", autocomplete="off") }}</td>
                     <td>{{ settings.purchase_mode(autocomplete="off") }}</td>
                     <td>{{ settings.save(class="inputButton") }}</td>
                 </tr>
@@ -31,3 +34,4 @@
         </form>
     </div>
 </div>
+

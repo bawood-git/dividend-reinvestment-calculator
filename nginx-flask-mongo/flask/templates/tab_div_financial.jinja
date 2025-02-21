@@ -8,11 +8,15 @@
         <table>
             <tr>
                 <th>Current Price</th>
-                <td>{{model.financials['stock_price']}}</td>
+                <td>${{"{:,.2f}".format(model.financials['stock_price'])}}</td>
             </tr>
             <tr>
                 <th>Book Value</th>
-                <td>{{model.financials['book_value']}}</td>
+                <td>${{"{:,.2f}".format(model.financials['book_value'])}}</td>
+            </tr>
+            <tr>
+                <th>Analyst Target</th>
+                <td>${{model.financials['target_price']}}</td>
             </tr>
             <tr>
                 <th>Beta</th>

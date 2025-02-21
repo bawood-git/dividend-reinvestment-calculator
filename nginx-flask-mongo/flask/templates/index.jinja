@@ -12,15 +12,25 @@
         </div>
         <div style="text-align: center; ">
             <br>
-            <div class="divContent" style="width: 1250px; margin:auto">
-                <table width="100%">
-                    <tr>
-                        <td><span class="tabTitle">Disclaimer</span></td>
+            <div class="divContent" style="width: 1355px; margin:auto">
+                <table style="width: 100%;">
+                    <tr style="height: 30px;;">
+                        <td style="vertical-align:top;"><span class="tabTitle"> Caveat Emptor</span></td>
                     </tr>
                 </table>            
-                <div class="divInnerContent" style="width: 1225px; margin:auto;">
-                    <p>Hey, thanks for trying me out. </p>
-                    <p>One quick note - this software is experimental at best and not intended to predict outcomes of future trades. Caviat emptor to the max. </p>
+                <div class="divInnerContent" style=" width: 1330px; margin:auto;">
+                    <p style="font-weight: bold;">This software is experimental at best. Please do your research before executing trades.
+                    <p>Stock quotes and company information is configured for Alpha Vantage (https://www.alphavantage.co) and in testing.
+                    <p>
+                        Place an API key in: ./flask/local/local_config.json with values: 
+                        { 
+                            "datasource":"alpha_vantage",
+                            "key":"your_key"
+                        }
+                    </p>
+                    <p> I am looking for alternative sources, including free endpoints, but that in secondary to getting the design finalized. 
+                        If you have any questions or suggestions, please feel free to reach out on GitHub. Thanks!
+                    </p>
                     <p>Now, go plug in a stock symbol in the search bar, located in the upper right corner of the page.</p>
                     <p>
                     </p>
