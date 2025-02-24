@@ -69,6 +69,12 @@ def report():
 
     if request.method =='POST': 
 
+        try:
+            csrf.protect()
+        except Exception as e:
+            return request.redirect('/error<e>')        
+        
+        
         # Lookup search input
         symbol = request.form.get('stock_symbol')
         data_model = DataModel(symbol)
@@ -108,7 +114,6 @@ def report():
         ###########################################################
         rows = []
         report = []
-        summary = ''
 
         # Dict parameters -> vars for cleaner math
         term            = int(settings_form.term.data)
@@ -139,10 +144,11 @@ def report():
         
         # Init summary totals
         totals = {
-            "contributions":0.00,
-            "starting_assets":shares_owned * share_price,
-            "starting_distribution":shares_owned * distribution,
-            "total_reinvested":0.00,
+            "initial_capital"       : initial_capital,
+            "contributions"         : 0.00,
+            "starting_assets"       : shares_owned * share_price,
+            "starting_distribution" : shares_owned * distribution,
+            "total_reinvested"      : 0.00,
         }
         
         # Calculate each period
@@ -209,7 +215,10 @@ def report():
         totals['periods'] = p
         totals['years_vested'] = term / income_sequence
        
-       # Assets/value
+        # Investment
+        totals['investment_tot'] = initial_capital + totals['contributions']
+       
+        # Assets/value
         totals['cash'] = balance
         totals['shares_owned'] = shares_owned
         totals['ending_assets'] = shares_owned * share_price
@@ -225,10 +234,13 @@ def report():
         totals['yield_years'] = 100 * (data_model.financials['annual_yield'] * total_years)
         totals['income_annual'] =  (distribution * shares_owned) * income_sequence
         
-        summary = render_template('tab_div_summary.jinja', totals=totals, model=data_model)
+        summary = render_template('tab_div_summary.jinja', totals=totals, model=data_model, frequency=frequency)
 
-# Roll up chart data
-
+        
+        ###################################
+        # Roll up chart data
+        ###################################
+        
         # History
         div_history_dates = []
         div_history_amount = []
@@ -262,7 +274,7 @@ def report():
                                 rows       = rows,                  # Data? FIXME
                                 summary    = summary,               # Data? FIXME
                                 chart_sim  = tab_div_chart_sim,     # Widget
-                                model      = data_model             # Data
+                                model      = data_model,            # Data
                                 ), 200, {'ContentType':'text/html; charset=utf-8'}
         
 @app.route('/search', methods=['POST'])
@@ -399,7 +411,7 @@ def settings():
        
          # Load form data -> dict
         cookie_settings = {
-            "initial_capital"  : request.form.get('initial_capital'),
+            "initial_capital" : request.form.get('initial_capital'),
             "shares_owned"  : request.form.get('shares_owned'),
             "term"          : request.form.get('term'),
             "frequency"     : request.form.get('frequency'),

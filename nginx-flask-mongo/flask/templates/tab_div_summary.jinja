@@ -15,8 +15,16 @@
                 <td style="text-align: left;">{{ "{:.2f}".format(totals['years_vested'])}}</td>
             </tr>
             <tr>
-                <th>Total Contributions</th>
+                <th>Initial Capital</th>
+                <td style="text-align: left;">${{ "{:,.2f}".format(totals['initial_capital'])}}</td>
+            </tr>
+            <tr>
+                <th>Recurring</th>
                 <td style="text-align: left;">${{ "{:,.2f}".format(totals['contributions'])}}</td>
+            </tr>
+            <tr>
+                <th>Total Investment</th>
+                <td style="text-align: left;">${{ "{:,.2f}".format(totals['investment_tot'])}}</td>
             </tr>
             <tr>
                 <th style="padding-top:3%; border-bottom: 1px solid black;">Assets</th>
@@ -36,27 +44,33 @@
                 <td style="text-align: left;">{{"{:,.2f}".format(totals['shares_owned'])}}</td>
             </tr>
             <tr>
-                <th style="padding-top:3%; border-bottom: 1px solid black;">Dividends</th>
-                <th style="padding-top:3%; border-bottom: 1px solid black;">${{"{:,.2f}".format(totals['ending_distribution'])}}</th>
+                <th style="padding-top:3%; border-bottom: 1px solid black;" colspan="2">Dividends</th>
             </tr>
             <tr>
-                <th>Avg Periodic Growth</th>
-                <td style="text-align: left;">
-                ${{"{:,.2f}".format(totals['distribution_growth_avg'])}}
-                </td>
+                <th>{{frequency}}</th>
+                <td style="text-align: left;">${{"{:,.2f}".format(totals['ending_distribution'])}}</td>
             </tr>
             <tr>
-                <th>Total Growth</th>
-                <td style="text-align: left;">
-                    ${{"{:,.2f}".format(totals['distribution_growth_tot'])}} / {{"{:,.2f}".format(totals['distribution_growth_pct'])}}%
-                </td>
-            </tr>
-            <tr>
-                <th>Annual Total</th>
+                <th>Annual</th>
                 <td style="text-align: left;">{{"${:,.2f}".format(totals['income_annual'])}}</td>
             </tr>
             <tr>
-                <th>Total Reinvested</th>
+                <th>Progression</th>
+                <td style="text-align: left;">
+                    ${{"{:,.2f}".format(totals['starting_distribution'])}}
+                    &rightarrow;
+                    ${{"{:,.2f}".format(totals['distribution_growth_tot'])}} 
+                    ({{"{:+,.2f}".format(totals['distribution_growth_pct'])}}%)
+                </td>
+            </tr>
+            <tr>
+                <th>Avg Change</th>
+                <td style="text-align: left;">
+                    ${{"{:,.2f}".format(totals['distribution_growth_avg'])}}
+                </td>
+            </tr>
+            <tr>
+                <th>Reinvested</th>
                 <td style="text-align: left;">{{"${:,.2f}".format(totals['total_reinvested'])}}</td>
             </tr>
         </table>
