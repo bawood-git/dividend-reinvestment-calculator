@@ -2,11 +2,11 @@
     <table class="tableHeader" style="width:100%; padding:10px 10px; border:none; text-align:left;">
         <tr>
             <td>
-                <span class="heading">Dividend Reinvestment Calculator</span>
+                <span class="heading">{{ app_info.name }}</span>
                 <br>
-                <span class="subheading">v0.4.6</span>
+                <span class="subheading">{{ app_info.version }}</span>
                 <br>
-                <span style="color:white;">Session: {{session['username']}}</span>
+                <span style="color:white;">Session: {{ session['username'] }} API: {{ session['api_src'] }}</span>
             </td>
             <td style="width: 226px;">
                 <a href="{{url_for('index')}}">Home</a> &nbsp;

@@ -19,6 +19,12 @@ from flask_wtf          import CSRFProtect
 from divcalc_data   import DataModel
 from divcalc_forms  import StockSettingsForm, APISettingsForm, DivCalcForm, LoginForm
 
+#App Info
+app_info = {
+    'name'    :'Dividend Reinvestment Calculator',
+    'version' : '0.4.7'
+}
+
 # Config
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
@@ -34,7 +40,7 @@ csrf = CSRFProtect(app)
 
 @app.route('/', methods=['GET'])
 def index():
-    tab_div_header = render_template("tab_div_header.jinja")
+    tab_div_header = render_template("tab_div_header.jinja", app_info=app_info)
 
     return render_template('index.jinja', 
                            header = tab_div_header
@@ -121,7 +127,8 @@ def report():
         settings_form.volatility.data    = request.form.get('volatility')
         settings_form.purchase_mode.data = request.form.get('purchase_mode')          
 
-        tab_div_header  = render_template("tab_div_header.jinja")
+        tab_div_header  = render_template("tab_div_header.jinja", 
+                                          app_info=app_info)
         tab_div_calc    = render_template('tab_div_calc.jinja', 
                                           form = settings_form, 
                                           data = data_model)
@@ -277,7 +284,7 @@ def report():
                                 config     = tab_div_calc,          # Widget
                                 summary    = tab_div_summary,       # Widget
                                 chart_sim  = tab_div_chart_sim,     # Widget
-                                report     = tab_div_report,
+                                report     = tab_div_report,        # Widget
                                 model      = data_model,            # Data
                                 ), 200, {'ContentType':'text/html; charset=utf-8'}
         
@@ -290,7 +297,7 @@ def search():
         symbol = request.form.get('symbol').upper()
         
         # Page header
-        tab_div_header = render_template("tab_div_header.jinja")
+        tab_div_header = render_template("tab_div_header.jinja", app_info=app_info)
         
         # Confirm data source
         api_config = {
@@ -318,9 +325,9 @@ def search():
             
             # Update session history
             if 'stock_history' in session and session['stock_history'] is not None:
-                session['stock_history'].append(symbol)
+                session['stock_history'].appendleft(symbol)
             else:
-                session['stock_history'] = deque([symbol], maxlen=10)
+                session['stock_history'] = deque([symbol], maxlen=5)
 
             
             # Init config defaults based on search result and cookie settings
@@ -409,7 +416,7 @@ def settings():
             settings_form.purchase_mode.data = session['purchase_mode']
     
         # Render widgets 
-        tab_div_header = render_template("tab_div_header.jinja")
+        tab_div_header = render_template("tab_div_header.jinja", app_info=app_info)
         tab_div_settings = render_template('tab_div_settings.jinja', 
                                            settings=settings_form, 
                                            api_settings=api_settings_form)
@@ -452,7 +459,7 @@ def settings():
         session['purchase_mode'] = stock_settings_form.purchase_mode.data
                 
         # Render widget(s)
-        tab_div_header = render_template("tab_div_header.jinja")
+        tab_div_header = render_template("tab_div_header.jinja", app_info=app_info)
         tab_div_settings = render_template('tab_div_settings.jinja', 
                                            settings=stock_settings_form, 
                                            api_settings=api_settings_form)
