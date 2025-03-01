@@ -8,7 +8,7 @@
 </head>
 <title>DivCalc Simulation Report</title>
 <body>
-    <div class="page">
+    <div class="page" id="page">
         {{header|safe}}
         <table width="100%">
             <tr>
@@ -28,12 +28,23 @@
 
     <script>
         document.getElementById("link_pdf").addEventListener('click', () => {
-                dqs = document.querySelector(".page");
+            const reportContent = document.getElementById("page");
+            html2canvas(reportContent).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
                 const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                
-                doc.html(dqs);
-                doc.save("{{ticker}}.pdf");
+                const pdf = new jsPDF();
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+                const now = new Date();
+                const date = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+                const filename = date + ".{{ model.profile.stock_symbol }}.pdf";
+
+
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save(filename);
+            });
         });
     </script>
 
