@@ -9,7 +9,7 @@
     --div-border:         rgba(169, 169, 169, 0.75);    /* Widget border */
     --div-content:        #6a7e95;    /* Widget container background */
     --div-content-border: #5a6778;    /* Widget border */
-    --tbl-content:        White;      /* Widget information panel background with alpha */
+    --tbl-content:        rgb(255, 255, 255, 0.85);      /* Widget information panel background */
     --tbl-heading:        #000000;    /* Content headings */
     --tbl-rpt-txt:        #FFFCF2;    /* Report tool text */
   }
@@ -36,15 +36,11 @@
     color:            var(--link-hover);
   }
   
-  .inputTip{
-    height:           15px;
-    margin-left:      3px;  
-  }
-
   .inputText {
+    margin: 2px;
     font-size:        medium;
     padding:          8px;
-    width:            125px;
+    width:            95px;
     border:           1px solid var(--div-border);
     border-radius:    5px;
     outline:          none;
@@ -71,11 +67,13 @@
 }
 
   .inputButton {
-    font-size:        medium;
-    padding:          10px;
-    width:            75px;
-    border:           1px solid var(--div-border);
-    border-radius:    10px;
+    font-size         : medium;
+    padding           : 10px;
+    width             : 75px;
+    border            : 1px solid var(--div-border);
+    border-radius     : 10px;
+    background-color  : seagreen;
+    color             : #ffff;
   }
 
   .inputButton:hover {
@@ -89,7 +87,7 @@
   select {
     font-size:        medium;
     padding:          8px;
-    width:            140px;
+    width:            110px;
     border:           1px solid var(--div-border);
     border-radius:    5px;
     outline:          none;
@@ -146,22 +144,7 @@
     font-weight:      bold;
     text-align:       left;
   }
-
-  .tableHeader {
-    width:            100%;
-    padding:          10px 10px;
-    border:           none;
-    text-align:       left;
-  }
-/* DEL */
-  .tableContent {
-    width:            100%;
-    padding:          10px 10px;
-    background-color: var(--tbl-content);
-    border-radius:    15px;
-    vertical-align:   top;
-  }
-
+/* TABLE ELEMENTS */
   th {
     font-size:        medium;
     color:            var(--tbl-heading);
@@ -170,65 +153,15 @@
     text-align:       left;
   }
   
+  .thSummarySection {
+    padding-top:      3%; 
+    border-bottom:    1px solid black;    
+  }
+
+
   td {
     text-align:       left;
-    vertical-align:   top;
+    vertical-align:   middle;
   }
 
-  .login {
-    display:          flex;
-    justify-content:  center;
-  }
 
-  .chart {
-    padding-left:     5px;
-    width:            800px;
-    border:           2px solid var(--div-content-border);
-    border-radius:    5px;
-  }
-
-  .totals {
-    margin-left:      10px;
-    padding-left:     5px;
-  }
-
-  .rptHeader {
-    color:            var(--tbl-rpt-txt);
-  }
-
-  .rptRow {
-    color:            var(--tbl-rpt-txt);
-  }
-
-  .tooltip {
-    position:         relative;
-    display:          inline-block;
-    border-bottom:    1px dotted black;
-  }
-  
-  .tooltip .tooltiptext {
-    visibility:       hidden;
-    width:            225px;
-    height:           40px;
-    background-color: #4e4e4e;
-    color:            #ffffff;
-    border-radius:    5px;
-    padding:          5px;
-    position:         absolute;
-    z-index:          1;
-    opacity:          0;
-    transition:       opacity 0.3s;
-  }
-  
-  .tooltip .tooltiptext::after {
-    content:          "";
-    position:         absolute;
-    border-width:     5px;
-    border-style:     solid;
-    border-color:     #555 transparent transparent transparent;
-  }
-  
-  .tooltip:hover .tooltiptext {
-    visibility:       visible;
-    opacity:          1;
-  }

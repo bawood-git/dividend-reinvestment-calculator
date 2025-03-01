@@ -1,15 +1,56 @@
 import json, requests, statistics
 
-class APIConfiguration:
-    def __init__(self, path):
-        config = ''
-        with open(path, 'r') as f:
-            self.config = json.load(f)
+class ManualStock:
+    def __init__(self):
+        self.data = {
+            "stock_symbol"      : 'Manual Entry',
+            "company_name"      : 'Manual Entry',
+            "company_desc"      : 'Manual Entry',
+            "company_website"   : 'Manual Entry',
+            "stock_sector"      : 'Manual Entry',
+            "stock_industry"    : 'Manual Entry',
+            "exchange"          : 'Manual Entry',
+        }
+        self.dividend_history = []
+        self.financials = {
+            "dividend"          : 0.0,
+            "dec_date"          : 'Manual Entry',
+            "rcd_date"          : 'Manual Entry',
+            "pay_date"          : 'Manual Entry',
+            "annual_yield"      : 0.0,
+            "share_price"       : 0.0,
+            "target_price"      : 0.0,
+            "book_value"        : 0.0,
+            "beta"              : 0.0,
+        }
+        self.articles = []
+        self.sentiment = 'Neutral - Mean:None'
+        self.config = {
+            "shares"            : None,
+            "dividend"          : None,
+            "term"              : None,
+            "frequency"         : None,
+            "contributions"     : None,
+            "volatility"        : None,
+            "purchase_mode"     : None,
+        }
+        self.report = {
+            "years_vested"      : None,
+        }
+
+
 
 class AlphaVantage:
-    def __init__(self, config):
-        self.config = config
-        self.key = config['key']
+    def __init__(self, key):
+        self.key = key
+        if key == None:
+            return {}
+        
+    def test(self):
+        url = f'https://www.alphavantage.co/query?function=MARKET_STATUS&apikey={self.key}'
+        r = requests.get(url)
+        return r.json()
+        
 
     def getOverview(self, symbol):
         url = f'https://www.alphavantage.co/query?function=OVERVIEW&symbol={symbol}&apikey={self.key}'
@@ -59,75 +100,3 @@ class AlphaVantage:
             sentiment_desc = [float(sentiment['ticker_sentiment_score']) for sentiment in article.get('ticker_sentiment') ]
             sentiment_avg = None
         return f'{sentiment_desc} - Mean:{sentiment_avg}'
-
-
-
-class DataModel:
-        def __init__(self, symbol):
-            api_config = APIConfiguration('./local/local_config.json')
-            if api_config.config['datasource'] == 'alpha_vantage':
-                from divcalc_api import AlphaVantage
-                api_functions = AlphaVantage(api_config.config)
-            
-            overview = api_functions.getOverview(symbol)
-            if overview == None or len(overview) == 0:
-                return None
-
-            # Historical is ordered newest -> oldest 
-            dividends = api_functions.getDividendHistory(symbol)
-            dividend  = dividends[0]
-            quote     = api_functions.getQuote(symbol)
-            news      = api_functions.getNewsSentiment(symbol)
-
-            self.profile = {
-                "stock_symbol"      : symbol,
-                "company_name"      : overview['Name'],
-                "company_desc"      : overview['Description'],
-                "company_website"   : overview['OfficialSite'],
-                "stock_sector"      : overview['Sector'],
-                "stock_industry"    : overview['Industry'],
-                "exchange"          : overview['Exchange'],
-            }
-            
-            # Some records have missing fields
-            self.dividend_history = [d for d in dividends if len(d['payment_date']) == 10]
-            
-            self.financials = {
-                "dividend"          : float(dividend['amount']),
-                "dec_date"          : dividend['declaration_date'],
-                "rcd_date"          : dividend['record_date'],
-                "pay_date"          : dividend['payment_date'],
-                "annual_yield"      : float(overview['DividendYield']),
-                "stock_price"       : float(quote['05. price']),
-                "target_price"      : overview['AnalystTargetPrice'],
-                "book_value"        : float(overview['BookValue']),
-                "beta"              : float(overview['Beta']),
-            }
-
-            self.articles           = news
-            self.sentiment          = api_functions.getSentimentScore(symbol)
-
-            self.config = {
-                "shares"            : None,
-                "dividend"          : None,
-                "term"              : None,
-                "frequency"         : None,
-                "contributions"     : None,
-                "volatility"        : None,
-                "purchase_mode"     : None,
-            }
-
-            self.report = {
-                "years_vested"      : None,
-                "contrib_vested"    : None,
-                "div_vested"        : None,
-                "asset_growth_pct"  : None,
-                "asset_start_val"   : None,
-                "asset_end_val"     : None,
-                "asset_cnt"         : None,
-                "div_growth_pct"    : None,
-                "div_start_amt"     : None,
-                "div_end_amt"       : None,
-                "years_vested"      : None,
-                "years_vested"      : None,
-            }

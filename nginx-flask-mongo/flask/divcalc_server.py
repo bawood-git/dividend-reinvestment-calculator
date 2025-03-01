@@ -2,46 +2,43 @@
 
 # System
 import os
-import json
 import random
-import statistics
 from decimal import *
-
+#import authlib
+from collections import deque
 # Mongo
 from pymongo import MongoClient
 
 # Flask
-from flask_bootstrap import Bootstrap5
-from flask import Flask, render_template, request, make_response
-from flask_session import Session
-from flask_wtf import CSRFProtect, FlaskForm
-from wtforms.validators import DataRequired, Length    
+from flask              import Flask, request, session, render_template, redirect
+from flask_bootstrap    import Bootstrap5
+from flask_session      import Session
+from flask_wtf          import CSRFProtect
 
 # Local
-from divcalc_api import APIConfiguration, DataModel
-from divcalc_forms import SettingsForm, DivCalcForm
+from divcalc_data   import DataModel
+from divcalc_forms  import StockSettingsForm, APISettingsForm, DivCalcForm, LoginForm
 
 # Config
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
-app.secret_key = 'f4h5WR77S6w_pnvzZAwMHGuTW-1vDc2C'
+
+#FIXME Maybe include a vault?
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev")
 
 bootstrap = Bootstrap5(app)
 csrf = CSRFProtect(app)
-client = MongoClient("mongo:27017")
-
-api_config = APIConfiguration('./local/local_config.json')
-if api_config.config['datasource'] == 'alpha_vantage':
-    from divcalc_api import AlphaVantage
-    api_functions = AlphaVantage(api_config.config)
+#client = MongoClient("mongo:27017")
 
 @app.route('/', methods=['GET'])
 def index():
     tab_div_header = render_template("tab_div_header.jinja")
 
-    return render_template('index.jinja', header=tab_div_header), 200, {'ContentType':'text/html; charset=utf-8'} 
+    return render_template('index.jinja', 
+                           header = tab_div_header
+                           ), 200, {'ContentType':'text/html; charset=utf-8'} 
 
 @app.route('/export/<mode>', methods=['GET','POST'])
 def export(mode):
@@ -59,32 +56,63 @@ def history():
     #FIXME
     return f'TODO: Add chart/data visual from alpha.getDividendHistory()'
 
+@app.route("/login", methods=["POST", "GET"])
+def login():
+    
+    if request.method == 'GET':
+        tab_div_login = render_template("tab_div_login.jinja", login_form=LoginForm())
+        return render_template('login.jinja', login=tab_div_login )
+    
+    if request.method == 'POST':
+        #FIXME
+        session['api_src'] = None
+        session['api_key'] = None
+        session["username"] = request.form.get("username")
+        
+        if session["username"] != None:
+            return redirect('/')
+        else:
+            tab_div_login = render_template("tab_div_login.jinja", login_form=LoginForm())
+            return render_template('login.jinja', login=tab_div_login )
+
+@app.route("/logout", methods=["GET"])
+def logout():
+
+    session["username"] = None
+        
+    tab_div_login = render_template("tab_div_login.jinja", login_form=LoginForm())
+    return render_template('login.jinja', login=tab_div_login )
+        
+
 @app.route('/news/<symbol>', methods=['GET','POST'])
 def news(symbol):
-    news = api_functions.getSentiment(symbol)                
-    return render_template('news.jinja', symbol=symbol, news=news), 200, {'ContentType':'text/html; charset=utf-8'} 
+    #news = api_functions.getSentiment(symbol)                
+    #return render_template('news.jinja', symbol=symbol, news=news), 200, {'ContentType':'text/html; charset=utf-8'}
+    return None
 
 @app.route('/report', methods=['GET','POST'])
 def report():
 
     if request.method =='POST': 
-
-        try:
-            csrf.protect()
-        except Exception as e:
-            return request.redirect('/error<e>')        
-        
-        
         # Lookup search input
         symbol = request.form.get('stock_symbol')
-        data_model = DataModel(symbol)
+
+        # Confirm data source
+        api_config = {
+            "api_src": session['api_src'],
+            "api_key": session['api_key'],
+        }
         
+        if api_config['api_src'] == None:
+            redirect('/settings',code=302, Response=None)
+        
+        # Search and build stock profile
+        data_model = DataModel(config=api_config, symbol=symbol)
+
         # Init config defaults based on search result and cookie settings
         settings_form = DivCalcForm()
-        # Hidden fields. Better way?
         settings_form.stock_symbol.data  = request.form.get('stock_symbol')
         settings_form.share_price.data   = request.form.get('share_price')
-        # Mix of company stock data and prefernces
         settings_form.shares_owned.data  = request.form.get('shares_owned')
         settings_form.distribution.data  = request.form.get('distribution')
         settings_form.term.data          = request.form.get('term')
@@ -110,12 +138,10 @@ def report():
         ###########################################################
 
         ###########################################################
-        # VARS
+        # Load Parameters
         ###########################################################
-        rows = []
-        report = []
 
-        # Dict parameters -> vars for cleaner math
+        # Form data -> vars for cleaner math
         term            = int(settings_form.term.data)
         initial_capital = float(settings_form.initial_capital.data)   
         shares_owned    = float(settings_form.shares_owned.data)
@@ -127,11 +153,10 @@ def report():
         frequency       = settings_form.frequency.data
 
         ###########################################################
-        # MAIN LOOP
+        # Initialize assets and beginning balance
         ###########################################################
         
         # Create position based on initial capital
-       
         balance = 0.00
         # Fractional - Use all capital (initial and recurring contributions) to purchase shares
         if purchase_mode == 'Fractional':
@@ -151,25 +176,23 @@ def report():
             "total_reinvested"      : 0.00,
         }
         
-        # Calculate each period
-        for p in range(1, 1 + term):
+        ###########################################################
+        # Simulate periods through term
+        ###########################################################
+        report = []
 
+        for p in range(1, 1 + term):
+            
+            dividend = shares_owned * distribution
+
+            #Purchase power
+            balance += dividend + contribution
+            
             #Calculate volatile price 
             if volatility > 0:
                 v1 = share_price + (share_price * (volatility -1)) / 100
                 v2 = share_price - (share_price * (volatility -1)) / 100
-                share_price = random.uniform(v1, v2)
-            
-            dividend = shares_owned * distribution
-            # Calculate volatile dividend
-            if volatility > 0:
-                v1 = distribution + (distribution * (volatility -1)) / 100
-                v2 = distribution - (distribution * (volatility -1)) / 100
-                distribution = random.uniform(v1, v2)
-                dividend = shares_owned * distribution
-            
-            #Purchase power
-            balance += dividend + contribution
+                share_price = round(random.uniform(v1, v2),4)
 
             # Define allocation of shares to purchase
             if purchase_mode == 'Fractional':
@@ -184,21 +207,20 @@ def report():
                 balance = balance - (shares_purchased * share_price)
 
             row_data = {
-                "period"        : p,
-                "balance"       : balance,
-                "shares_owned"  : shares_owned,
-                "price"         : share_price,
-                "asset_value"   : shares_owned * share_price,
-                "dividend"      : f'${distribution:,.2f}',
-                "income"        : f'${(distribution * shares_owned):,.2f}',
-                "contribution"  : f'${contribution:,.2f}',
-                "purchased"     : shares_purchased,
+                "period"            : p,
+                "balance"           : balance,
+                "shares_owned"      : shares_owned,
+                "share_price"       : share_price,
+                "asset_value"       : shares_owned * share_price,
+                "dividend"          : f'${distribution:,.2f}',
+                "income"            : f'${(distribution * shares_owned):,.2f}',
+                "contribution"      : f'${contribution:,.2f}',
+                "shares_purchased"  : shares_purchased,
             }
             totals['contributions'] += contribution
             totals['total_reinvested'] += dividend
-
+            
             report.append(row_data)
-            rows.append(render_template('dividend_row.jinja', **row_data))
         
         # Roll up Report Summary totals not in loop
         match frequency:
@@ -210,7 +232,6 @@ def report():
                income_sequence = 2
             case 'Annual':
                income_sequence = 1
-        total_years = term / income_sequence 
                         
         totals['periods'] = p
         totals['years_vested'] = term / income_sequence
@@ -222,58 +243,41 @@ def report():
         totals['cash'] = balance
         totals['shares_owned'] = shares_owned
         totals['ending_assets'] = shares_owned * share_price
-        totals['asset_growth_tot'] = 100 * (totals['ending_assets'] / totals['starting_assets'])
-        totals['asset_growth_avg'] = totals['asset_growth_tot'] / term
         
         # Dividends/income
         totals['ending_distribution'] = distribution * shares_owned
         totals['distribution_growth_tot'] = totals['ending_distribution'] - totals['starting_distribution']
         totals['distribution_growth_pct'] = 100 * (totals['distribution_growth_tot'] / totals['starting_distribution'])
         totals['distribution_growth_avg'] = totals['distribution_growth_tot'] / term
-        totals['reinvestment_gain'] = 100 * ((totals['distribution_growth_pct'] / 100) - (data_model.financials['annual_yield'] * total_years))
-        totals['yield_years'] = 100 * (data_model.financials['annual_yield'] * total_years)
         totals['income_annual'] =  (distribution * shares_owned) * income_sequence
         
-        summary = render_template('tab_div_summary.jinja', totals=totals, model=data_model, frequency=frequency)
-
-        
+        tab_div_summary = render_template('tab_div_summary.jinja', totals=totals, model=data_model, frequency=frequency)
+        tab_div_report  = render_template('tab_div_report_rows.jinja', report=report)
         ###################################
         # Roll up chart data
         ###################################
         
-        # History
-        div_history_dates = []
-        div_history_amount = []
-        
-        for d in data_model.dividend_history:
-            div_history_dates.append(d['payment_date'])
-            div_history_amount.append(d['amount'])
-                
-        #labels = [ d for d in data_model.dividend_history[0]]
-        #y1     = [ d for d in data_model.dividend_history[1]]
-        tab_div_chart_hist = render_template('tab_div_chart_hist.jinja',
-                                div_dates   = div_history_dates, 
-                                div_amounts = div_history_amount)        
-  
         # Simulation
         i = len(report)
         cols = [i for i in range(1, i +1)]
         income = [float(r.get('income').replace('$','').replace(',','')) for r in report]
         assets = [r.get('asset_value') for r in report]
-        price  = [r.get('price') for r in report]
+        price  = [r.get('share_price') for r in report]
         tab_div_chart_sim = render_template('tab_div_chart_sim.jinja',
                                 labels = cols, 
                                 income = income,
                                 assets = assets,
-                                price  = price)        
+                                price  = price,
+                                frequency = frequency,
+                                )        
 
-# Roll up report
+        # Roll up report
         return render_template('report.jinja', 
                                 header     = tab_div_header,        # Widget
                                 config     = tab_div_calc,          # Widget
-                                rows       = rows,                  # Data? FIXME
-                                summary    = summary,               # Data? FIXME
+                                summary    = tab_div_summary,       # Widget
                                 chart_sim  = tab_div_chart_sim,     # Widget
+                                report     = tab_div_report,
                                 model      = data_model,            # Data
                                 ), 200, {'ContentType':'text/html; charset=utf-8'}
         
@@ -288,8 +292,17 @@ def search():
         # Page header
         tab_div_header = render_template("tab_div_header.jinja")
         
-        # Lookup search input
-        data_model = DataModel(symbol)
+        # Confirm data source
+        api_config = {
+            "api_src": session['api_src'],
+            "api_key": session['api_key'],
+        }
+        
+        if api_config['api_src'] == None:
+            return redirect('/settings',code=302, Response=None)
+        
+        # Search and build stock profile
+        data_model = DataModel(config=api_config, symbol=symbol)
         
         # No records returned, error out
         if not hasattr(data_model, 'profile'):
@@ -303,40 +316,37 @@ def search():
         # Record found, fetch all data, build form
         else:
             
+            # Update session history
+            if 'stock_history' in session and session['stock_history'] is not None:
+                session['stock_history'].append(symbol)
+            else:
+                session['stock_history'] = deque([symbol], maxlen=10)
+
+            
             # Init config defaults based on search result and cookie settings
             settings_form = DivCalcForm()
             
             # Hidden fields. Better way?
             settings_form.stock_symbol.data  = symbol
-            settings_form.share_price.data   = data_model.financials['stock_price']
+            settings_form.share_price.data   = data_model.financials['share_price']
             
-            # Prefernces
-            if request.cookies.get('shares_owned') != None:
-                settings_form.shares_owned.data  = Decimal(request.cookies.get('shares_owned'))
-            else:
-                settings_form.shares_owned.data  = Decimal(0.00)
-            if request.cookies.get('term') != None:
-                settings_form.term.data = int(request.cookies.get('term'))
-            else:
-                settings_form.term.data = int(120)
-            if request.cookies.get('frequency') != None:
-                settings_form.frequency.data = request.cookies.get('frequency')
-            else:
-                settings_form.frequency.data = 'Monthly'
-            if request.cookies.get('contribution') != None:
-                settings_form.contribution.data = Decimal(request.cookies.get('contribution'))
-            else:
-                settings_form.contribution.data = Decimal(0.00)
-            if request.cookies.get('purchase_mode') != None:
-                settings_form.purchase_mode.data = request.cookies.get('purchase_mode')
-            else:
-                settings_form.purchase_mode.data = 'Modulus'
+            # Set form defaults with prefernces if set
+            if session['shares_owned'] != None:
+                settings_form.shares_owned.data  = Decimal(session['shares_owned'])
+            if session['term'] != None:
+                settings_form.term.data = int(session['term'])
+            if session['frequency'] != None:
+                settings_form.frequency.data = session['frequency']
+            if session['contribution'] != None:
+                settings_form.contribution.data = Decimal(session['contribution'])
+            if session['purchase_mode'] != None:
+                settings_form.purchase_mode.data = session['purchase_mode']
             
             # Company stock data 
             settings_form.distribution.data  = Decimal(data_model.financials['dividend'])
             settings_form.volatility.data    = Decimal(data_model.financials['beta'])
 
-            # Chart Stuff
+            # Chart Axes
             div_dates = []
             div_amounts = []
             
@@ -344,11 +354,7 @@ def search():
                 div_dates.append(d['payment_date'])
                 div_amounts.append(d['amount'])
                 
-            #labels = [ d for d in data_model.dividend_history[0]]
-            #y1     = [ d for d in data_model.dividend_history[1]]
-            
-            
-            # Create widgets
+            # Create page widgets
             tab_div_profile = render_template('tab_div_profile.jinja',   model=data_model)
             tab_div_finance = render_template('tab_div_financial.jinja', model=data_model)
             tab_div_history = render_template('tab_div_history.jinja',   model=data_model)
@@ -356,8 +362,11 @@ def search():
                                                div_dates   = div_dates,
                                                div_amounts = div_amounts
                                                )
-            tab_div_calc    = render_template('tab_div_calc.jinja',      form=settings_form, data=data_model)
-
+            tab_div_calc    = render_template('tab_div_calc.jinja',
+                                              form=settings_form,
+                                              data=data_model
+                                              )
+            # Render page with widgets
             return render_template('search.jinja', 
                                    header   = tab_div_header, 
                                    profile  = tab_div_profile, 
@@ -369,75 +378,91 @@ def search():
 
 @app.route('/settings', methods=['GET','POST'])
 def settings():
-    tab_div_header = render_template("tab_div_header.jinja")
+
+    if session['username'] == None:
+        return redirect('/login', code=302, Response=None)
 
     if request.method == 'GET':
 
         # Load form, cookies -> fields
-        settings_form = SettingsForm()
-        if request.cookies.get('initial_capital') != None:
-            settings_form.shares_owned.data = Decimal(request.cookies.get('initial_capital'))
-        else:
-            settings_form.shares_owned.data  = Decimal(1000.00)
-        if request.cookies.get('shares_owned') != None:
-            settings_form.shares_owned.data = Decimal(request.cookies.get('shares_owned'))
-        else:
-            settings_form.shares_owned.data  = Decimal(100.00)
-        if request.cookies.get('term') != None:
-            settings_form.term.data = int(request.cookies.get('term'))
-        else:
-            settings_form.term.data = int(12)
-        if request.cookies.get('frequency') != None:
-            settings_form.frequency.data = request.cookies.get('frequency')
-        else:
-            settings_form.frequency.data = 'Monthly'
-        if request.cookies.get('contribution') != None:
-            settings_form.contribution.data = Decimal(request.cookies.get('contribution'))
-        else:
-            settings_form.contribution.data = Decimal(0.00)
-        if request.cookies.get('purchase_mode') != None:
-            settings_form.purchase_mode.data = request.cookies.get('purchase_mode')
-        else:
-            settings_form.purchase_mode.data = 'Modulus'
+        api_settings_form = APISettingsForm()
+        settings_form = StockSettingsForm()
+        
+        # Load form data from session - API settings
+        if session['api_src'] != None:
+            api_settings_form.api_src.data = session['api_src']
+        if session['api_key'] != None:
+            api_settings_form.api_key.data = session['api_key']
+            
+        # Load form data from session - Stock settings
+        if session['initial_capital'] != None:
+            settings_form.initial_capital.data = Decimal(session['initial_capital'])
+        if session['contribution'] != None:
+            settings_form.contribution.data = Decimal(session['contribution'])
+        if session['shares_owned'] != None:
+            settings_form.shares_owned.data = Decimal(session['shares_owned'])
+        if session['term'] != None:
+            settings_form.term.data = session['term']
+        if session['frequency'] != None:
+            settings_form.frequency.data = session['frequency']
+        if session['purchase_mode'] != None:
+            settings_form.purchase_mode.data = session['purchase_mode']
     
-        # render form 
-        tab_div_settings = render_template('tab_div_settings.jinja', settings=settings_form)
-        return render_template('settings.jinja', 
-                               header   = tab_div_header, 
-                               content  = tab_div_settings
-                               ), 200, {'ContentType':'text/html; charset=utf-8'} 
-
+        # Render widgets 
+        tab_div_header = render_template("tab_div_header.jinja")
+        tab_div_settings = render_template('tab_div_settings.jinja', 
+                                           settings=settings_form, 
+                                           api_settings=api_settings_form)
+        settings_page    = render_template('settings.jinja',
+                                           header=tab_div_header,
+                                           content=tab_div_settings
+                                           ), 200, {'ContentType':'text/html; charset=utf-8'} 
+        return settings_page
+    
     if request.method == 'POST':
-       
-         # Load form data -> dict
-        cookie_settings = {
-            "initial_capital" : request.form.get('initial_capital'),
-            "shares_owned"  : request.form.get('shares_owned'),
-            "term"          : request.form.get('term'),
-            "frequency"     : request.form.get('frequency'),
-            "contribution"  : request.form.get('contribution'),
-            "purchase_mode" : request.form.get('purchase_mode'),
-        }
         
-        # Load form, init fields from request
-        settings_form = SettingsForm()
-        settings_form.initial_capital.data = request.form.get('initial_capital')
-        settings_form.shares_owned.data    = request.form.get('shares_owned')
-        settings_form.term.data            = request.form.get('term')
-        settings_form.frequency.data       = request.form.get('frequency')
-        settings_form.contribution.data    = request.form.get('contribution')
-        settings_form.purchase_mode.data   = request.form.get('purchase_mode')
+        # Update session API settings
+        api_settings_form = APISettingsForm()
         
-        # Render html components
-        tab_div_settings = render_template('tab_div_settings.jinja', settings=settings_form)
-        response = make_response(render_template('settings.jinja', 
-                                                 header  = tab_div_header, 
-                                                 content = tab_div_settings,
-                                                 ), 200, {'ContentType':'text/html; charset=utf-8'})
-        # Write dict -> cookies
-        for k, v in cookie_settings.items():
-            response.set_cookie(k, v)
-        return response
+        api_settings_form.api_src.data = request.form.get('api_src')
+        session['api_src'] = api_settings_form.api_src.data
+        
+        api_settings_form.api_src.data = request.form.get('api_key')
+        session['api_key'] = api_settings_form.api_key.data
+        
+        # Update session stock configuration settings     
+        stock_settings_form = StockSettingsForm()
+        
+        stock_settings_form.initial_capital.data = request.form.get('initial_capital')
+        session['initial_capital'] = stock_settings_form.initial_capital.data
+        
+        stock_settings_form.contribution.data = request.form.get('contribution')
+        session['contribution'] = stock_settings_form.contribution.data
+                
+        stock_settings_form.shares_owned.data = request.form.get('shares_owned')
+        session['shares_owned'] = stock_settings_form.shares_owned.data
+        
+        stock_settings_form.term.data = request.form.get('term')
+        session['term'] = stock_settings_form.term.data
+        
+        stock_settings_form.frequency.data = request.form.get('frequency')
+        session['frequency'] = stock_settings_form.frequency.data
+        
+        stock_settings_form.purchase_mode.data = request.form.get('purchase_mode')
+        session['purchase_mode'] = stock_settings_form.purchase_mode.data
+                
+        # Render widget(s)
+        tab_div_header = render_template("tab_div_header.jinja")
+        tab_div_settings = render_template('tab_div_settings.jinja', 
+                                           settings=stock_settings_form, 
+                                           api_settings=api_settings_form)
+        # Render page
+        settings_page    = render_template('settings.jinja',
+                                           header=tab_div_header,
+                                           content=tab_div_settings,
+                                           #api_status = api_status,
+                                           ), 200, {'ContentType':'text/html; charset=utf-8'}
+        return settings_page
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=os.environ.get("FLASK_SERVER_PORT", 9090), debug=True)

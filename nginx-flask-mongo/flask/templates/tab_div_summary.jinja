@@ -8,59 +8,61 @@
     <div class="divInnerContent" style="height:366px">
         <table>
             <tr>
-                <th style="border-bottom: 1px solid black;" colspan="2">Vestment</th>
+                <th colspan="2">
+                    {{ model.profile['company_name'] }}
+                    ({{ model.profile['stock_symbol'] }})
+                </th>
+            </tr>
+            <tr>
+                <th class="thSummarySection"  colspan="2">Vestment</th>
             </tr>
             <tr>
                 <th>Years Vested</th>
-                <td style="text-align: left;">{{ "{:.2f}".format(totals['years_vested'])}}</td>
+                <td style="text-align: left;">
+                    {{ "{:.2f}".format(totals['years_vested']) }}
+                </td>
             </tr>
             <tr>
                 <th>Initial Capital</th>
-                <td style="text-align: left;">${{ "{:,.2f}".format(totals['initial_capital'])}}</td>
+                <td style="text-align: left;">
+                    ${{ "{:,.2f}".format(totals['initial_capital']) }}
+                </td>
             </tr>
             <tr>
                 <th>Recurring</th>
-                <td style="text-align: left;">${{ "{:,.2f}".format(totals['contributions'])}}</td>
+                <td style="text-align: left;">
+                    ${{ "{:,.2f}".format(totals['contributions']) }}
+                </td>
             </tr>
             <tr>
                 <th>Total Investment</th>
-                <td style="text-align: left;">${{ "{:,.2f}".format(totals['investment_tot'])}}</td>
+                <td style="text-align: left;">
+                    ${{ "{:,.2f}".format(totals['investment_tot']) }}
+                    @{{model.financials['share_price']}}/share
+                </td>
             </tr>
             <tr>
-                <th style="padding-top:3%; border-bottom: 1px solid black;">Assets</th>
-                <th style="padding-top:3%; border-bottom: 1px solid black;" >{{"${:,.2f}".format(totals['ending_assets'] + totals['cash'])}}</td>
-
+                <th class="thSummarySection" colspan="2">Dividends</th>
             </tr>
             <tr>
-                <th>Cash</th>
-                <td style="text-align: left;">{{"${:,.2f}".format(totals['cash'])}}</td>
-            </tr>
-            <tr>
-                <th>Securities</th>
-                <td style="text-align: left;">{{"${:,.2f}".format(totals['ending_assets'])}}</td>
-            </tr>
-            <tr>
-                <th>Shares Owned</th>
-                <td style="text-align: left;">{{"{:,.2f}".format(totals['shares_owned'])}}</td>
-            </tr>
-            <tr>
-                <th style="padding-top:3%; border-bottom: 1px solid black;" colspan="2">Dividends</th>
-            </tr>
-            <tr>
-                <th>{{frequency}}</th>
-                <td style="text-align: left;">${{"{:,.2f}".format(totals['ending_distribution'])}}</td>
+                <th> {{ frequency }} </th>
+                <td style="text-align: left;">
+                    ${{ "{:,.2f}".format(totals['ending_distribution']) }}
+                </td>
             </tr>
             <tr>
                 <th>Annual</th>
-                <td style="text-align: left;">{{"${:,.2f}".format(totals['income_annual'])}}</td>
+                <td style="text-align: left;">
+                    {{ "${:,.2f}".format(totals['income_annual']) }}
+                </td>
             </tr>
             <tr>
-                <th>Progression</th>
+                <th>Progression ($)</th>
                 <td style="text-align: left;">
-                    ${{"{:,.2f}".format(totals['starting_distribution'])}}
+                    {{ "{:+,.2f}".format(totals['starting_distribution']) }}
                     &rightarrow;
-                    ${{"{:,.2f}".format(totals['distribution_growth_tot'])}} 
-                    ({{"{:+,.2f}".format(totals['distribution_growth_pct'])}}%)
+                    {{ "{:+,.2f}".format(totals['distribution_growth_tot']) }} 
+                    ({{ "{:+,.2f}".format(totals['distribution_growth_pct']) }}%)
                 </td>
             </tr>
             <tr>
@@ -71,7 +73,36 @@
             </tr>
             <tr>
                 <th>Reinvested</th>
-                <td style="text-align: left;">{{"${:,.2f}".format(totals['total_reinvested'])}}</td>
+                <td style="text-align: left;">
+                    {{"${:,.2f}".format(totals['total_reinvested'])}}
+                </td>
+            </tr>
+            <tr>
+                <th  class="thSummarySection" colspan="2" >Assets</th>
+            </tr>
+            <tr>
+                <th>Shares Owned</th>
+                <td style="text-align: left;">
+                    {{ "{:,.2f}".format(totals['shares_owned']) }}
+                </td>
+            </tr>
+            <tr>
+                <th>Cash Balance</th>
+                <td style="text-align: left;">
+                    $ {{ "{:,.2f}".format(totals['cash']) }}
+                </td>
+            </tr>
+            <tr>
+                <th>Securities</th>
+                <td style="text-align: left;">
+                    {{ "${:,.2f}".format(totals['ending_assets']) }}
+                </td>
+            </tr>
+            <tr>
+                <th>Total</th>
+                <td>
+                    {{ "${:,.2f}".format(totals['ending_assets'] + totals['cash']) }}
+                </td>
             </tr>
         </table>
     </div>

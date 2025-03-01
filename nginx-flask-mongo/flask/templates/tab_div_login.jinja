@@ -1,0 +1,23 @@
+<div class="divContent" style="width: 1355px; margin:auto;">
+    <table style="width: 100%;">
+        <tr style="height: 30px;;">
+            <td style="vertical-align:top;"><span class="tabTitle">Login</span></td>
+            <td style="text-align: right;"><a href="{{ url_for('help') }}" target="_blank">Help</a></td>
+        </tr>
+    </table>            
+    <div class="divInnerContent" style="width: 1330px; margin:auto;">
+        <form form action="{{ url_for('login') }}" method="post" id="loginForm">
+            <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
+            <table>
+                <tr>
+                    <th>Username</th>
+                </tr>
+                <tr>
+                    <td>{{ login_form.username(class="inputText", style="width:400px") }}</td>
+                    <td>{{ login_form.login(class="inputButton") }}</td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+

@@ -9,28 +9,30 @@
         <form action="{{ url_for('report') }}" method="post" name="reportForm" id="reportForm">
             <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
             {{form.stock_symbol}}
-            {{form.share_price}}
+            {{form.source}}
             <table width="100%">
-                <tr style="text-align: center;">
-                    <th>Initial Capital  </th>
-                    <th>Recurring Capital</th>
-                    <th>Shares Owned     </th>
-                    <th>Dividend         </th>
-                    <th>Periods          </th>
-                    <th>Frequency        </th>
-                    <th>Volatility       </th>
-                    <th>Reinvest Mode    </th>
+                <tr>
+                    <th style="text-align: left;">Initial Amt.  </th>
+                    <th style="text-align: left;">Contributions </th>
+                    <th style="text-align: left;">Shares        </th>
+                    <th style="text-align: left;">Mode          </th>
+                    <th style="text-align: left;">Price         </th>
+                    <th style="text-align: left;">Dividend      </th>
+                    <th style="text-align: left;">Term          </th>
+                    <th style="text-align: left;">Frequency     </th>
+                    <th style="text-align: left;">Volatility    </th>
                 </tr>
-                <tr style="text-align: center;">
-                    <td>{{ form.initial_capital(autocomplete="off", class="inputText") }}</td>
-                    <td>{{ form.contribution(autocomplete="off", class="inputText") }}</td>
-                    <td>{{ form.shares_owned(autocomplete="off", class="inputText") }}</td>
-                    <td>{{ form.distribution(autocomplete="off", class="inputText") }}</td>
-                    <td>{{ form.term(autocomplete="off", class="inputText") }}</td>
-                    <td>{{ form.frequency(autocomplete="off") }}</td>
-                    <td>{{ form.volatility(autocomplete="off", class="inputText") }}</td>
-                    <td>{{ form.purchase_mode(autocomplete="off") }}</td>
-                    <td>{{ form.run(class="inputButton") }}</td>
+                <tr>
+                    <td style="text-align: left;">{{ form.initial_capital(autocomplete="off", class="inputText") }}</td>
+                    <td style="text-align: left;">{{ form.contribution(autocomplete="off", class="inputText") }}</td>
+                    <td style="text-align: left;">{{ form.shares_owned(autocomplete="off", class="inputText") }}</td>
+                    <td style="text-align: left;">{{ form.purchase_mode(autocomplete="off") }}</td>
+                    <td style="text-align: left;">{{ form.share_price(autocomplete="off", class="inputText") }}</td>
+                    <td style="text-align: left;">{{ form.distribution(autocomplete="off", class="inputText") }}</td>
+                    <td style="text-align: left;">{{ form.term(autocomplete="off", class="inputText") }}</td>
+                    <td style="text-align: left;">{{ form.frequency(autocomplete="off") }}</td>
+                    <td style="text-align: left;">{{ form.volatility(autocomplete="off", class="inputText") }}</td>
+                    <td style="text-align: left;">{{ form.run(class="inputButton") }}</td>
                 </tr>
             </table>
         </form>

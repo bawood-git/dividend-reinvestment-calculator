@@ -1,0 +1,41 @@
+<div class="divContent">
+    <table width="100%">
+        <tr>
+            <td><span class="tabTitle">Simulation Data</span></td>
+            <td style="text-align: right;">
+                <a id="link_pdf" href="#">PDF</a>
+                <a href="/data/?f=csv" target="_blank">CSV</a>
+                <a href="/data/?f=json" target="_blank">JSON</a>
+            </td>
+        </tr>
+    </table>
+    <div class="divInnerContent" style="height:400px">
+        <table width="100%">
+            <tr>
+                <th>Period</th>
+                <th>Dividend</th>
+                <th>Distribution</th>
+                <th>Contributions</th>
+                <th>Share Price</th>
+                <th>Shares Purchased</th>
+                <th>Acct. Balance</th>
+                <th>Shares Owned</th>
+                <th>Asset Value</th>
+            </tr>
+            {% for r in report %}
+            <tr>
+                <td>{{ r['period'] }}</td>
+                <td>{{ r['dividend'] }}</td>
+                <td>{{ r['income'] }}</td>
+                <td>{{ r['contribution'] }}</td>
+                <td>{{ r['share_price'] }}</td>
+                <td>{{ "{:,.3f}".format(r['shares_purchased']) }}</td>
+                <td>${{ "{:,.2f}".format(r['balance']) }}</td>
+                <td>{{ "{:,.2f}".format(r['shares_owned']) }}</td>
+                <td>${{ "{:,.2f}".format(  r['asset_value'] )}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+

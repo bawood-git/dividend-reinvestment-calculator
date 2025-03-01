@@ -2,11 +2,6 @@
     <table width="100%">
         <tr>
             <td><span class="tabTitle">Simulation</span></td>
-            <td style="text-align: right;">
-                <a id="link_pdf" href="#">PDF</a>
-                <a href="/data/csv" target="_blank">CSV</a>
-                <a href="/data/json" target="_blank">JSON</a>
-            </td>
         </tr>
     </table>
 
@@ -30,7 +25,7 @@ Chart.register({
 			}
 		});
 
-    const simCTX = document.getElementById('sim_chart').getContext('2d');
+    const simCTX   = document.getElementById('sim_chart').getContext('2d');
     const simChart = new Chart(simCTX, {
         
         data: {
@@ -71,7 +66,7 @@ Chart.register({
                 x: {
                     title: {
                         display: true,
-                        text: 'Term (Periods)',
+                        text: 'Term: {{ frequency }}',
                         color: 'white'
                     },
                     ticks: {
@@ -81,13 +76,13 @@ Chart.register({
                 },
                 y1: {
                     type:'linear',
-                    position:'left',
+                    position:'right',
                     grid: {
                         drawOnChartArea: false,
                     },
                     title: {
                         display: true,
-                        text: 'Dividend',
+                        text: '{{frequency}} Dividend',
                         color: 'white'
                     },
                     ticks: {
@@ -98,7 +93,7 @@ Chart.register({
                     }
                 },
                 y3: {
-                    type:'linear',
+                    type:'logarithmic',
                     position:'right',
                     grid: {
                         drawOnChartArea: false,

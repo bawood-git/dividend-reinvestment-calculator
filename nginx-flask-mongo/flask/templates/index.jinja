@@ -8,10 +8,9 @@
     <title>DivCalc Home</title>
     <body>
         <div class="page">
-            {{header|safe}}
-        </div>
-        <div style="text-align: center; ">
+            {{ header }}
             <br>
+
             <div class="divContent" style="width: 1355px; margin:auto">
                 <table style="width: 100%;">
                     <tr style="height: 30px;;">
@@ -21,21 +20,33 @@
                 <div class="divInnerContent" style=" width: 1330px; margin:auto;">
                     <p style="font-weight: bold;">This software is experimental at best. Please do your research before executing trades.
                     <p>Stock quotes and company information is configured for Alpha Vantage (https://www.alphavantage.co) and in testing.
-                    <p>
-                        Place an API key in: ./flask/local/local_config.json with values: 
-                        { 
-                            "datasource":"alpha_vantage",
-                            "key":"your_key"
-                        }
-                    </p>
                     <p> I am looking for alternative sources, including free endpoints, but that in secondary to getting the design finalized. 
                         If you have any questions or suggestions, please feel free to reach out on GitHub. Thanks!
                     </p>
                     <p>Now, go plug in a stock symbol in the search bar, located in the upper right corner of the page.</p>
                     <p>
+                        {{ names }}
                     </p>
                 </div>
             </div>
+
+            <table width="100%">
+                <tr>
+                    <td colspan="2" style="padding-top: 15px;">{{ config }}</td>
+                </tr>
+                <tr style="padding-top: 15px;">
+                    <td style="width: 600px; padding-right: 15px; padding-top: 15px;">{{ profile }}</td>
+                    <td style="padding-top: 15px;">{{ finance }}</td>
+                </tr>
+                <tr>
+                    <td style="width: 600px; padding-right: 15px; padding-top: 15px;">
+                        {{ chart }}
+                    </td>
+                    <td style="padding-top: 15px;">{{ history }}</td>
+                </tr>
+            </table>
         </div>
+
+
     </body>
 </html>
