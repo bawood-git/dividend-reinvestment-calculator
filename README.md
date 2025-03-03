@@ -24,8 +24,8 @@ Known issues (not in order of importance)
   *  PDF export is functional, though I'd like to change the layout before calling it complete
   *  CSV export is not functional. I need to develop a temp file solution, so storage will be limited to something like last 10 exports
   *  JSON export is not funcional. I experimented with a few options and I think I want this to be two things:
-     # UI Report -> target="_blank" for a text copy/paste page load
-     # Console /endpoint for middleware scripting (med-long project later this year) 
+     * UI Report -> target="_blank" for a text copy/paste page load
+     * Console /endpoint for middleware scripting (med-long project later this year) 
 *  Settings: Preferences are meh. 
 *  System Components:
    *  SSL not included until I build a default end-to-end self signed certificae script in Docker
