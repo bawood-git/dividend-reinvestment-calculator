@@ -311,8 +311,8 @@ def search():
         # Search and build stock profile
         data_model = DataModel(config=api_config, symbol=symbol)
         
-        # No records returned, error out
-        if not hasattr(data_model, 'profile'):
+        # No records returned on profile, error out
+        if data_model.profile.get('stock_symbol') == None:
             msg= '''
                 <p> No records matched your search term: {symbol}</p>
                 <p> Only individual stocks are available for research at this time. ETFs, mutual funds, and the like will not appear.</p>
@@ -328,7 +328,6 @@ def search():
                 session['stock_history'].appendleft(symbol)
             else:
                 session['stock_history'] = deque([symbol], maxlen=5)
-
             
             # Init config defaults based on search result and cookie settings
             settings_form = DivCalcForm()
@@ -340,12 +339,18 @@ def search():
             # Set form defaults with prefernces if set
             if session['shares_owned'] != None:
                 settings_form.shares_owned.data  = Decimal(session['shares_owned'])
+            # Add term if available from preference
             if session['term'] != None:
                 settings_form.term.data = int(session['term'])
-            if session['frequency'] != None:
+            # Add frequency if available from calculation, then preference
+            if data_model.dividend_frequency != None:
+                settings_form.frequency.data = data_model.dividend_frequency
+            if session['frequency'] != None and data_model.dividend_frequency == None:
                 settings_form.frequency.data = session['frequency']
+            # Add contribution if available from preference
             if session['contribution'] != None:
                 settings_form.contribution.data = Decimal(session['contribution'])
+            # Add purchase mode if available from preference
             if session['purchase_mode'] != None:
                 settings_form.purchase_mode.data = session['purchase_mode']
             
@@ -358,8 +363,8 @@ def search():
             div_amounts = []
             
             for d in data_model.dividend_history:
-                div_dates.append(d['payment_date'])
-                div_amounts.append(d['amount'])
+                div_dates.append(d.payment_date)
+                div_amounts.append(d.amount)
                 
             # Create page widgets
             tab_div_profile = render_template('tab_div_profile.jinja',   model=data_model)
