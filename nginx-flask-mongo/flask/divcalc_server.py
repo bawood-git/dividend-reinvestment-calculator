@@ -294,10 +294,7 @@ def search():
     if request.method == 'POST':
 
         # API data filtering key
-        symbol = request.form.get('symbol').upper()
-        
-        # Page header
-        tab_div_header = render_template("tab_div_header.jinja", app_info=app_info)
+        symbol = request.form.get('stock_symbol').upper()
         
         # Confirm data source
         api_config = {
@@ -313,6 +310,8 @@ def search():
         
         # No records returned on profile, error out
         if data_model.profile.get('stock_symbol') == None:
+            tab_div_header = render_template("tab_div_header.jinja", app_info=app_info)
+
             msg= '''
                 <p> No records matched your search term: {symbol}</p>
                 <p> Only individual stocks are available for research at this time. ETFs, mutual funds, and the like will not appear.</p>
@@ -320,10 +319,10 @@ def search():
             '''.format(symbol=symbol)
             return render_template('error.jinja', msg=msg, header=tab_div_header)
 
-        # Record found, fetch all data, build form
+        # Record found, fetch all data, build form, add valid data to session
         else:
             
-            # Update session history
+            # Update session stock search history
             if 'stock_history' in session and session['stock_history'] is not None:
                 session['stock_history'].appendleft(symbol)
             else:
@@ -367,6 +366,7 @@ def search():
                 div_amounts.append(d.amount)
                 
             # Create page widgets
+            tab_div_header = render_template("tab_div_header.jinja", app_info=app_info)
             tab_div_profile = render_template('tab_div_profile.jinja',   model=data_model)
             tab_div_finance = render_template('tab_div_financial.jinja', model=data_model)
             tab_div_history = render_template('tab_div_history.jinja',   model=data_model)

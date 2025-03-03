@@ -18,7 +18,7 @@
                         <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
                         <input type="hidden" name="source" value = "search_form" />
                         <img src="{{ url_for('static', filename='mag.png') }}" height="14px" style="margin-left: 5px;" />
-                        <input type="text" name="symbol" id="symbol" class="inputSearchText" placeholder="Search Symbol" list="history"/>
+                        <input type="text" name="stock_symbol" id="stock_symbol" class="inputSearchText" placeholder="Search Symbol" list="history"/>
                         <datalist id="history">
                             {% for symbol in session['stock_history'] %}
                                 <option value="{{ symbol }}">{{ symbol }}</option>
@@ -30,3 +30,18 @@
         </tr>
     </table>
 </div>
+
+<script>
+    /* 
+        This script will submit the form when a stock symbol is selected from the dropdown list
+    */
+        document.getElementById('stock_symbol').addEventListener('input', function() {
+            const options = document.getElementById('history').options;
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].value === this.value) {
+                    document.getElementById('search_form').submit();
+                    break;
+                }
+            }
+        });
+</script>
