@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1.4
 FROM --platform=$BUILDPLATFORM python:3.10-alpine AS builder
 
+RUN pip install --upgrade pip
+
 WORKDIR /src
 COPY requirements.txt /src
 RUN --mount=type=cache,target=/root/.cache/pip \
