@@ -254,7 +254,12 @@ def report():
         # Dividends/income
         totals['ending_distribution'] = distribution * shares_owned
         totals['distribution_growth_tot'] = totals['ending_distribution'] - totals['starting_distribution']
-        totals['distribution_growth_pct'] = 100 * (totals['distribution_growth_tot'] / totals['starting_distribution'])
+        
+        # If you zero out inputs, you have no growth!
+        if totals['distribution_growth_tot'] > 0:
+            totals['distribution_growth_pct'] = 100 * (totals['distribution_growth_tot'] / totals['starting_distribution'])
+        else:
+            totals['distribution_growth_pct'] = 0
         totals['distribution_growth_avg'] = totals['distribution_growth_tot'] / term
         totals['income_annual'] =  (distribution * shares_owned) * income_sequence
         
@@ -361,7 +366,7 @@ def search():
             div_dates = []
             div_amounts = []
             
-            for d in data_model.dividend_history:
+            for d in data_model.dividend_history[::-1]:
                 div_dates.append(d.payment_date)
                 div_amounts.append(d.amount)
                 

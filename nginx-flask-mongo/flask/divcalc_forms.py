@@ -6,7 +6,7 @@ class DivCalcForm(FlaskForm):
     source          = HiddenField()
     csrf_token      = HiddenField()
     stock_symbol    = HiddenField()
-    initial_capital = DecimalField(default=1000.00, validators=[DataRequired(), NumberRange(min=0.01)])
+    initial_capital = DecimalField(default=1000.00)
     share_price     = DecimalField(default=10.00,   validators=[DataRequired(), NumberRange(min=0.01)])
     shares_owned    = DecimalField(default=0.00,    validators=[DataRequired(), NumberRange(min=0.00)])
     distribution    = DecimalField(default=0.10,    validators=[DataRequired(), NumberRange(min=0.00)])
