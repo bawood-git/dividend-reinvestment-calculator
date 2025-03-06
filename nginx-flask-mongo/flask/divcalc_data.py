@@ -1,6 +1,177 @@
 import datetime
+import random
 from dateutil import parser
 from collections import Counter
+
+
+class Calculator:
+    def __init__(self, data_model):
+        self.data_model = data_model
+        self.config = data_model.config
+        self.report = [] #data_model.report
+        
+        self.totals = {}
+        
+    def run(self):
+
+        term = self.config['term']
+        initial_capital = self.config['initial_capital']
+        shares_owned = self.config['shares_owned']
+        contribution = self.config['contribution']
+        share_price = self.config['share_price']
+        volatility = self.config['volatility']
+        distribution = self.config['distribution']
+        purchase_mode = self.config['purchase_mode']
+        frequency = self.config['frequency']
+
+
+
+
+        ###########################################################
+        # Initialize assets and beginning balance
+        ###########################################################
+        
+        # Create position based on initial capital
+        balance = 0.00
+        # Fractional - Use all capital (initial and recurring contributions) to purchase shares
+        if purchase_mode == 'Fractional':
+            shares_owned += initial_capital / share_price
+        # Modulus - Maintain a balance carryover, which would be < price of 1 share
+        else:
+            shares_purchased = initial_capital // share_price
+            shares_owned += shares_purchased
+            balance = initial_capital - (shares_purchased * share_price)
+        
+        # Init summary totals
+        self.totals = {
+            "initial_capital"       : initial_capital,
+            "contributions"         : 0.00,
+            "initial_shares"        : shares_owned,
+            "starting_assets"       : shares_owned * share_price,
+            "starting_distribution" : shares_owned * distribution,
+            "total_reinvested"      : 0.00,
+        }
+        
+        ###########################################################
+        # Simulate periods through term
+        ###########################################################
+        match frequency:
+            case 'Monthly':
+                income_sequence = 12
+            case 'Quarterly':
+                income_sequence = 4
+            case 'Semiannual':
+               income_sequence = 2
+            case 'Annual':
+               income_sequence = 1
+        
+        frequency_map = {
+            'Monthly'   : 12,
+            'Quarterly' : 4,
+            'Semiannual': 2,
+            'Annual'    : 1
+        }
+        
+        months_map = {
+            1   : ['December'],
+            2   : ['June', 'December'],
+            4   : ['March', 'June', 'September', 'December'],
+            12  : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+        }
+        
+        quarters_map = {
+            1   : ['Q4'],
+            2   : ['Q2', 'Q4'],
+            4   : ['Q1', 'Q2', 'Q3', 'Q4'],
+            12  : ['Q1', 'Q1', 'Q1', 'Q2', 'Q2', 'Q2', 'Q3', 'Q3', 'Q3', 'Q4', 'Q4', 'Q4']
+        }
+        
+        income_sequence = frequency_map.get(frequency, 1)
+        months = months_map[income_sequence]
+        quarters = quarters_map[income_sequence]
+
+        #report = []
+        
+        # Loop through term
+        for p in range(1, 1 + (term * income_sequence)):
+            
+            # Calculate period to year/quarter/month based on frequency
+            year = (p - 1) // income_sequence + 1
+            month = months[(p - 1) % len(months)]
+            quarter = quarters[(p - 1) % len(quarters)]
+                
+            # Calculate dividend
+            dividend = shares_owned * distribution
+
+            #Purchase power
+            balance += dividend + contribution
+            
+            #Calculate volatile price 
+            if volatility > 0:
+                v1 = share_price + (share_price * (volatility -1)) / 100
+                v2 = share_price - (share_price * (volatility -1)) / 100
+                share_price = round(random.uniform(v1, v2),4)
+
+            # Define allocation of shares to purchase
+            if purchase_mode == 'Fractional':
+                shares_purchased = balance / share_price  # Simple division if fractional purchase allowed. Need fees adjustment
+            else:
+                #Modulus (whole shares only)
+                shares_purchased = balance // share_price # Whole shares only
+
+            # Update data for term (row)
+            if shares_purchased >= 0:
+                shares_owned += shares_purchased
+                balance = balance - (shares_purchased * share_price)
+
+            row_data = {
+                "period"            : p,
+                "year"              : year,
+                "quarter"           : quarter,
+                "month"             : month,
+                "balance"           : balance,
+                "shares_owned"      : shares_owned,
+                "share_price"       : share_price,
+                "asset_value"       : shares_owned * share_price,
+                "dividend"          : f'${distribution:,.2f}',
+                "income"            : f'${(distribution * shares_owned):,.2f}',
+                "contribution"      : f'${contribution:,.2f}',
+                "shares_purchased"  : shares_purchased,
+            }
+            self.totals['contributions'] += contribution
+            self.totals['total_reinvested'] += dividend
+            
+            self.report.append(row_data)
+       
+       ###########################################################
+       # Roll up totals
+       ###########################################################
+        self.totals['periods'] = p
+        self.totals['years_vested'] = year
+       
+        # Investment
+        self.totals['investment_tot'] = initial_capital + self.totals['contributions']
+       
+        # Assets/value
+        self.totals['cash'] = balance
+        self.totals['shares_owned'] = shares_owned
+        self.totals['ending_assets'] = shares_owned * share_price
+        
+        # Dividends/income
+        self.totals['ending_distribution'] = distribution * shares_owned
+        self.totals['distribution_growth_tot'] = self.totals['ending_distribution'] - self.totals['starting_distribution']
+        
+        # If you zero out inputs, you have no growth!
+        if self.totals['distribution_growth_tot'] > 0:
+            self.totals['distribution_growth_pct'] = 100 * (self.totals['distribution_growth_tot'] / self.totals['starting_distribution'])
+        else:
+            self.totals['distribution_growth_pct'] = 0
+        self.totals['distribution_growth_avg'] = self.totals['distribution_growth_tot'] / term
+        self.totals['income_annual'] =  (distribution * shares_owned) * income_sequence
+
+
+
+
 
 class Dividend:
     # Standard mapping for dividend data from variable API sources
@@ -54,30 +225,18 @@ class DataModel:
 
             # User Data            
             self.config = {
-                "shares"            : None,
-                "dividend"          : None,
                 "term"              : None,
-                "frequency"         : None,
-                "contributions"     : None,
+                "initial_capital"   : None,
+                "shares_owned"      : None,
+                "contribution"      : None,
+                "share_price"       : None,
                 "volatility"        : None,
+                "distribution"      : None,
                 "purchase_mode"     : None,
+                "frequency"         : None,
+                "dividend"          : None,
             }
             
-            # Report Data
-            self.report = {
-                "years_vested"      : None,
-                "contrib_vested"    : None,
-                "div_vested"        : None,
-                "asset_growth_pct"  : None,
-                "asset_start_val"   : None,
-                "asset_end_val"     : None,
-                "asset_cnt"         : None,
-                "div_growth_pct"    : None,
-                "div_start_amt"     : None,
-                "div_end_amt"       : None,
-                "years_vested"      : None,
-                "years_vested"      : None,
-            }
         def getData(self, config, symbol=None):
             ########################################################
             #

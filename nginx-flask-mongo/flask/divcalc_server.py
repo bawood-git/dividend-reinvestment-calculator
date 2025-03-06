@@ -2,7 +2,6 @@
 
 # System
 import os
-import random
 from decimal import *
 #import authlib
 from collections import deque
@@ -16,13 +15,13 @@ from flask_session      import Session
 from flask_wtf          import CSRFProtect
 
 # Local
-from divcalc_data   import DataModel, Dividend
+from divcalc_data   import DataModel, Dividend, Calculator
 from divcalc_forms  import StockSettingsForm, APISettingsForm, DivCalcForm, LoginForm
 
 #App Info
 app_info = {
     'name'    :'Dividend Reinvestment Calculator',
-    'version' : '0.4.7'
+    'version' : '0.4.8'
 }
 
 # Config
@@ -112,10 +111,10 @@ def report():
         
         #data_model = DataModel(config=api_config, symbol=symbol)
         data_model = DataModel()
-        data_model.profile = data_model_data['profile']
-        data_model.financials = data_model_data['financials']
-        data_model.dividend_history = [Dividend(**d) for d in data_model_data['dividend_history']]
-        data_model.dividend_frequency = data_model_data['dividend_frequency']
+        data_model.profile              = data_model_data['profile']
+        data_model.financials           = data_model_data['financials']
+        data_model.dividend_history     = [Dividend(**d) for d in data_model_data['dividend_history']]
+        data_model.dividend_frequency   = data_model_data['dividend_frequency']
 
         # Init config defaults based on search result and cookie settings
         settings_form = DivCalcForm()
@@ -134,194 +133,46 @@ def report():
         tab_div_calc    = render_template('tab_div_calc.jinja', 
                                           form = settings_form, 
                                           data = data_model)
-        
-        ###########################################################
-        #
-        # 
-        # Data Calculations
-        # Notes
-        #   Beta is a value relative to the market. 
-        #     1.0 = parity 
-        #     2.0 = 200% above market
-        #    -1.0 = 100% inverse market
-        ###########################################################
 
         ###########################################################
         # Load Parameters
         ###########################################################
 
         # Form data -> vars for cleaner math
-        term            = int(settings_form.term.data)
-        initial_capital = float(settings_form.initial_capital.data)   
-        shares_owned    = float(settings_form.shares_owned.data)
-        contribution    = float(settings_form.contribution.data)     
-        share_price     = float(settings_form.share_price.data)
-        volatility      = float(settings_form.volatility.data)   
-        distribution    = float(settings_form.distribution.data)
-        purchase_mode   = settings_form.purchase_mode.data
-        frequency       = settings_form.frequency.data
-
-        ###########################################################
-        # Initialize assets and beginning balance
-        ###########################################################
         
-        # Create position based on initial capital
-        balance = 0.00
-        # Fractional - Use all capital (initial and recurring contributions) to purchase shares
-        if purchase_mode == 'Fractional':
-            shares_owned += initial_capital / share_price
-        # Modulus - Maintain a balance carryover, which would be < price of 1 share
-        else:
-            shares_purchased = initial_capital // share_price
-            shares_owned += shares_purchased
-            balance = initial_capital - (shares_purchased * share_price)
+        data_model.config['term']            = int(settings_form.term.data)
+        data_model.config['initial_capital'] = float(settings_form.initial_capital.data)
+        data_model.config['shares_owned']    = float(settings_form.shares_owned.data)
+        data_model.config['contribution']    = float(settings_form.contribution.data)
+        data_model.config['share_price']     = float(settings_form.share_price.data)
+        data_model.config['volatility']      = float(settings_form.volatility.data)
+        data_model.config['distribution']    = float(settings_form.distribution.data)
+        data_model.config['purchase_mode']   = settings_form.purchase_mode.data
+        data_model.config['frequency']       = settings_form.frequency.data
         
-        # Init summary totals
-        totals = {
-            "initial_capital"       : initial_capital,
-            "contributions"         : 0.00,
-            "initial_shares"        : shares_owned,
-            "starting_assets"       : shares_owned * share_price,
-            "starting_distribution" : shares_owned * distribution,
-            "total_reinvested"      : 0.00,
-        }
+        # Calculate dividend
+        calc = Calculator(data_model)
+        calc.run()
         
-        ###########################################################
-        # Simulate periods through term
-        ###########################################################
-        match frequency:
-            case 'Monthly':
-                income_sequence = 12
-            case 'Quarterly':
-                income_sequence = 4
-            case 'Semiannual':
-               income_sequence = 2
-            case 'Annual':
-               income_sequence = 1
-        
-        frequency_map = {
-            'Monthly'   : 12,
-            'Quarterly' : 4,
-            'Semiannual': 2,
-            'Annual'    : 1
-        }
-        
-        months_map = {
-            1   : ['December'],
-            2   : ['June', 'December'],
-            4   : ['March', 'June', 'September', 'December'],
-            12  : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-        }
-        
-        quarters_map = {
-            1   : ['Q4'],
-            2   : ['Q2', 'Q4'],
-            4   : ['Q1', 'Q2', 'Q3', 'Q4'],
-            12  : ['Q1', 'Q1', 'Q1', 'Q2', 'Q2', 'Q2', 'Q3', 'Q3', 'Q3', 'Q4', 'Q4', 'Q4']
-        }
-        
-        income_sequence = frequency_map.get(frequency, 1)
-        months = months_map[income_sequence]
-        quarters = quarters_map[income_sequence]
-
-        report = []
-        
-        # Loop through term
-        for p in range(1, 1 + (term * income_sequence)):
-            
-            # Calculate period to year/quarter/month based on frequency
-            year = (p - 1) // income_sequence + 1
-            month = months[(p - 1) % len(months)]
-            quarter = quarters[(p - 1) % len(quarters)]
-                
-            # Calculate dividend
-            dividend = shares_owned * distribution
-
-            #Purchase power
-            balance += dividend + contribution
-            
-            #Calculate volatile price 
-            if volatility > 0:
-                v1 = share_price + (share_price * (volatility -1)) / 100
-                v2 = share_price - (share_price * (volatility -1)) / 100
-                share_price = round(random.uniform(v1, v2),4)
-
-            # Define allocation of shares to purchase
-            if purchase_mode == 'Fractional':
-                shares_purchased = balance / share_price  # Simple division if fractional purchase allowed. Need fees adjustment
-            else:
-                #Modulus (whole shares only)
-                shares_purchased = balance // share_price # Whole shares only
-
-            # Update data for term (row)
-            if shares_purchased >= 0:
-                shares_owned += shares_purchased
-                balance = balance - (shares_purchased * share_price)
-
-            row_data = {
-                "period"            : p,
-                "year"              : year,
-                "quarter"           : quarter,
-                "month"             : month,
-                "balance"           : balance,
-                "shares_owned"      : shares_owned,
-                "share_price"       : share_price,
-                "asset_value"       : shares_owned * share_price,
-                "dividend"          : f'${distribution:,.2f}',
-                "income"            : f'${(distribution * shares_owned):,.2f}',
-                "contribution"      : f'${contribution:,.2f}',
-                "shares_purchased"  : shares_purchased,
-            }
-            totals['contributions'] += contribution
-            totals['total_reinvested'] += dividend
-            
-            report.append(row_data)
-       
-       ###########################################################
-       # Roll up totals
-       ###########################################################
-        totals['periods'] = p
-        totals['years_vested'] = year
-       
-        # Investment
-        totals['investment_tot'] = initial_capital + totals['contributions']
-       
-        # Assets/value
-        totals['cash'] = balance
-        totals['shares_owned'] = shares_owned
-        totals['ending_assets'] = shares_owned * share_price
-        
-        # Dividends/income
-        totals['ending_distribution'] = distribution * shares_owned
-        totals['distribution_growth_tot'] = totals['ending_distribution'] - totals['starting_distribution']
-        
-        # If you zero out inputs, you have no growth!
-        if totals['distribution_growth_tot'] > 0:
-            totals['distribution_growth_pct'] = 100 * (totals['distribution_growth_tot'] / totals['starting_distribution'])
-        else:
-            totals['distribution_growth_pct'] = 0
-        totals['distribution_growth_avg'] = totals['distribution_growth_tot'] / term
-        totals['income_annual'] =  (distribution * shares_owned) * income_sequence
-        
-        tab_div_summary = render_template('tab_div_summary.jinja', totals=totals, model=data_model, frequency=frequency)
-        tab_div_report  = render_template('tab_div_report_rows.jinja', report=report)
+        tab_div_summary = render_template('tab_div_summary.jinja', totals=calc.totals, model=data_model, frequency=calc.config['frequency'])
+        tab_div_report  = render_template('tab_div_report_rows.jinja', report=calc.report)
         
         ###################################
         # Roll up chart data
         ###################################
         
         # Simulation chart
-        i = len(report)
+        i = len(calc.report)
         cols = [i for i in range(1, i +1)]
-        income = [float(r.get('income').replace('$','').replace(',','')) for r in report]
-        assets = [r.get('asset_value') for r in report]
-        price  = [r.get('share_price') for r in report]
+        income = [float(r.get('income').replace('$','').replace(',','')) for r in calc.report]
+        assets = [r.get('asset_value') for r in calc.report]
+        price  = [r.get('share_price') for r in calc.report]
         tab_div_chart_sim = render_template('tab_div_chart_sim.jinja',
                                 labels = cols, 
                                 income = income,
                                 assets = assets,
                                 price  = price,
-                                frequency = frequency,
+                                frequency = data_model.config['frequency'],
                                 )        
 
         # Render page with widgets
@@ -354,6 +205,7 @@ def search():
         # Search and build stock profile
         data_model = DataModel()
         data_model.getData(config=api_config, symbol=symbol)
+        
         
         # No records returned on profile, error out
         if data_model.profile.get('stock_symbol') == None:
@@ -389,7 +241,13 @@ def search():
             settings_form.stock_symbol.data  = symbol
             settings_form.share_price.data   = data_model.financials['share_price']
             
+            ###########################################################
             # Set form defaults with prefernces if set
+            ###########################################################
+            # Add initial capital if available from preference
+            if session['initial_capital'] != None:
+                settings_form.initial_capital.data = Decimal(session['initial_capital'])
+            # Add shares owned if available from preference
             if session['shares_owned'] != None:
                 settings_form.shares_owned.data  = Decimal(session['shares_owned'])
             # Add term if available from preference
