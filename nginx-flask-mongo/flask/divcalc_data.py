@@ -22,7 +22,7 @@ class Dividend:
 
 
 class DataModel:
-        def __init__(self, config, symbol=None):
+        def __init__(self):
             # API Data
             self.profile = {
                 "stock_symbol"      : None,
@@ -78,6 +78,7 @@ class DataModel:
                 "years_vested"      : None,
                 "years_vested"      : None,
             }
+        def getData(self, config, symbol=None):
             ########################################################
             #
             # DataModel mapping to specic API configurations

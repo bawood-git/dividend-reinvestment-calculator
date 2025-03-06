@@ -16,7 +16,7 @@ from flask_session      import Session
 from flask_wtf          import CSRFProtect
 
 # Local
-from divcalc_data   import DataModel
+from divcalc_data   import DataModel, Dividend
 from divcalc_forms  import StockSettingsForm, APISettingsForm, DivCalcForm, LoginForm
 
 #App Info
@@ -99,21 +99,23 @@ def news(symbol):
 @app.route('/report', methods=['GET','POST'])
 def report():
 
-    if request.method =='POST': 
-        # Lookup search input
-        symbol = request.form.get('stock_symbol')
-
-        # Confirm data source
-        api_config = {
-            "api_src": session['api_src'],
-            "api_key": session['api_key'],
-        }
+    if request.method =='POST':
         
-        if api_config['api_src'] == None:
-            redirect('/settings',code=302, Response=None)
+        ###########################################################
+        # Load Data
+        ###########################################################
         
-        # Search and build stock profile
-        data_model = DataModel(config=api_config, symbol=symbol)
+        # Recreate DataModel instance using session data
+        data_model_data = session.get('data_model')
+        if data_model_data is None:
+            return redirect('/search', code=302, Response=None)
+        
+        #data_model = DataModel(config=api_config, symbol=symbol)
+        data_model = DataModel()
+        data_model.profile = data_model_data['profile']
+        data_model.financials = data_model_data['financials']
+        data_model.dividend_history = [Dividend(**d) for d in data_model_data['dividend_history']]
+        data_model.dividend_frequency = data_model_data['dividend_frequency']
 
         # Init config defaults based on search result and cookie settings
         settings_form = DivCalcForm()
@@ -350,7 +352,8 @@ def search():
             return redirect('/settings',code=302, Response=None)
         
         # Search and build stock profile
-        data_model = DataModel(config=api_config, symbol=symbol)
+        data_model = DataModel()
+        data_model.getData(config=api_config, symbol=symbol)
         
         # No records returned on profile, error out
         if data_model.profile.get('stock_symbol') == None:
@@ -366,6 +369,13 @@ def search():
         # Record found, fetch all data, build form, add valid data to session
         else:
             
+            # Store necessary data in the session
+            session['data_model'] = {
+                'profile'           : data_model.profile,
+                'financials'        : data_model.financials,
+                'dividend_history'  : [d.__dict__ for d in data_model.dividend_history],
+                'dividend_frequency': data_model.dividend_frequency
+            }            
             # Update session stock search history
             if 'stock_history' in session and session['stock_history'] is not None:
                 session['stock_history'].appendleft(symbol)
