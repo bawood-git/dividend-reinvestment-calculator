@@ -178,6 +178,7 @@ def report():
         totals = {
             "initial_capital"       : initial_capital,
             "contributions"         : 0.00,
+            "initial_shares"        : shares_owned,
             "starting_assets"       : shares_owned * share_price,
             "starting_distribution" : shares_owned * distribution,
             "total_reinvested"      : 0.00,
@@ -186,10 +187,52 @@ def report():
         ###########################################################
         # Simulate periods through term
         ###########################################################
-        report = []
+        match frequency:
+            case 'Monthly':
+                income_sequence = 12
+            case 'Quarterly':
+                income_sequence = 4
+            case 'Semiannual':
+               income_sequence = 2
+            case 'Annual':
+               income_sequence = 1
+        
+        frequency_map = {
+            'Monthly'   : 12,
+            'Quarterly' : 4,
+            'Semiannual': 2,
+            'Annual'    : 1
+        }
+        
+        months_map = {
+            1   : ['December'],
+            2   : ['June', 'December'],
+            4   : ['March', 'June', 'September', 'December'],
+            12  : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+        }
+        
+        quarters_map = {
+            1   : ['Q4'],
+            2   : ['Q2', 'Q4'],
+            4   : ['Q1', 'Q2', 'Q3', 'Q4'],
+            12  : ['Q1', 'Q1', 'Q1', 'Q2', 'Q2', 'Q2', 'Q3', 'Q3', 'Q3', 'Q4', 'Q4', 'Q4']
+        }
+        
+        income_sequence = frequency_map.get(frequency, 1)
+        months = months_map[income_sequence]
+        quarters = quarters_map[income_sequence]
 
-        for p in range(1, 1 + term):
+        report = []
+        
+        # Loop through term
+        for p in range(1, 1 + (term * income_sequence)):
             
+            # Calculate period to year/quarter/month based on frequency
+            year = (p - 1) // income_sequence + 1
+            month = months[(p - 1) % len(months)]
+            quarter = quarters[(p - 1) % len(quarters)]
+                
+            # Calculate dividend
             dividend = shares_owned * distribution
 
             #Purchase power
@@ -215,6 +258,9 @@ def report():
 
             row_data = {
                 "period"            : p,
+                "year"              : year,
+                "quarter"           : quarter,
+                "month"             : month,
                 "balance"           : balance,
                 "shares_owned"      : shares_owned,
                 "share_price"       : share_price,
@@ -228,20 +274,12 @@ def report():
             totals['total_reinvested'] += dividend
             
             report.append(row_data)
-        
-        # Roll up Report Summary totals not in loop
-        match frequency:
-            case 'Monthly':
-                income_sequence = 12
-            case 'Quarterly':
-                income_sequence = 4
-            case 'Semiannual':
-               income_sequence = 2
-            case 'Annual':
-               income_sequence = 1
-                        
+       
+       ###########################################################
+       # Roll up totals
+       ###########################################################
         totals['periods'] = p
-        totals['years_vested'] = term / income_sequence
+        totals['years_vested'] = year
        
         # Investment
         totals['investment_tot'] = initial_capital + totals['contributions']
@@ -265,11 +303,12 @@ def report():
         
         tab_div_summary = render_template('tab_div_summary.jinja', totals=totals, model=data_model, frequency=frequency)
         tab_div_report  = render_template('tab_div_report_rows.jinja', report=report)
+        
         ###################################
         # Roll up chart data
         ###################################
         
-        # Simulation
+        # Simulation chart
         i = len(report)
         cols = [i for i in range(1, i +1)]
         income = [float(r.get('income').replace('$','').replace(',','')) for r in report]
@@ -283,7 +322,7 @@ def report():
                                 frequency = frequency,
                                 )        
 
-        # Roll up report
+        # Render page with widgets
         return render_template('report.jinja', 
                                 header     = tab_div_header,        # Widget
                                 config     = tab_div_calc,          # Widget

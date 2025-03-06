@@ -12,6 +12,9 @@
     <div class="divInnerContent" style="height:400px">
         <table width="100%">
             <tr>
+                <th>Year</th>
+                <th>Quarter</th>
+                <th>Month</th>
                 <th>Period</th>
                 <th>Dividend</th>
                 <th>Distribution</th>
@@ -24,6 +27,9 @@
             </tr>
             {% for r in report %}
             <tr>
+                <td>{{ r['year'] }}</td>
+                <td>{{ r['quarter'] }}</td>
+                <td>{{ r['month'] }}</td>
                 <td>{{ r['period'] }}</td>
                 <td>{{ r['dividend'] }}</td>
                 <td>{{ r['income'] }}</td>
